@@ -9,18 +9,16 @@ endif()
 option(LJMD_VERSION "LJMD Version" 1.0)
 
 add_executable(MAIN.x src/main.cpp)
+target_include_directories(MAIN.x PUBLIC inc)
 
 add_library(Timer inc/Timer.hpp)
 set_target_properties(Timer PROPERTIES LINKER_LANGUAGE CXX)
 
-target_link_libraries(MAIN.x Timer)
+add_library(mdlib src/comp.c src/verlet.c src/output.c src/utils.c src/init.c src/structs.c)
+target_include_directories(mdlib PUBLIC inc)
+target_link_libraries(mdlib Timer)
 
-
-
-
-
-add_library(mdlib util/utils.c src/verlet.c)
-
+target_link_libraries(MAIN.x mdlib)
 
 option(MY_MPI "Enable MPI calls" OFF)
 if(MY_MPI)
