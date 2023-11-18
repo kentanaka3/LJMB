@@ -12,7 +12,19 @@
 *
 #include "structs_protos.hpp"
 
+#ifdef MY_MPI
+#include <mpi.h>
+#endif
+
+
 int main(int argc, char *argv[]) {
+#ifdef MY_MPI
+int mype, npes;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &mype);
+    MPI_Comm_size(MPI_COMM_WORLD, &npes);
+#endif
+
     int nprint, i;
     char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
     FILE *fp,*traj,*erg;
@@ -119,6 +131,10 @@ int main(int argc, char *argv[]) {
     free(sys.fx);
     free(sys.fy);
     free(sys.fz);
-    
+
+    #ifdef MY_MPI
+        MPI_Finalize();
+    #endif
+
     return 0;
 }
