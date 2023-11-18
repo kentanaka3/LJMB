@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-/* velocity verlet */
-=======
 #include "structs.h"
 #include "comp.h"
 #include <math.h>
@@ -16,7 +13,6 @@ void velverlet_prop(mdsys_t *sys){
 }
 
 /* velocity verlet part one*/
->>>>>>> 681f1c98edf0e5ffeac8d8d6f67d228c6ee7054f
 void velverlet(mdsys_t *sys) {
   /* first part: propagate velocities by half and positions by full step */
   for (int i = 0; i < sys->natoms; ++i) {
