@@ -6,6 +6,7 @@ if(POLICY CMP0135)
   cmake_policy(SET CMP0135 OLD)
 endif()
 
+option(LJMD_VERSION "LJMD Version" 1.0)
 
 add_executable(MAIN.x src/main.cpp)
 
@@ -21,9 +22,12 @@ target_link_libraries(MAIN.x Timer)
 add_library(mdlib util/utils.c src/verlet.c)
 
 
-
-
-
+option(MY_MPI "Enable MPI calls" OFF)
+if(MY_MPI)
+  add_library(myMPI inc/myMPI.hpp)
+  set_target_properties(myMPI PROPERTIES LINKER_LANGUAGE CXX)
+  target_link_libraries(MAIN.x myMPI)
+endif()
 
 option(TEST "Enable Unit Tests" OFF)
 if(TEST)
