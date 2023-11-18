@@ -1,7 +1,8 @@
-#include <stdlib.h>
+#include "structs_prots.hpp"
 
 
-static void azzero(double *d, const int n)
+/* helper function: zero out an array */
+void azzero(double *d, const int n)
 {
     int i;
     for (i=0; i<n; ++i) {
@@ -10,7 +11,7 @@ static void azzero(double *d, const int n)
 }
 
 /* helper function: apply minimum image convention */
-static double pbc(double x, const double boxby2)
+double pbc(double x, const double boxby2)
 {
     while (x >  boxby2) x -= 2.0*boxby2;
     while (x < -boxby2) x += 2.0*boxby2;
