@@ -1,4 +1,4 @@
-#include "structs_prots.hpp"
+#include "structs.hpp"
 
 /* append data to output. */
 void output(mdsys_t *sys, FILE *erg, FILE *traj){
