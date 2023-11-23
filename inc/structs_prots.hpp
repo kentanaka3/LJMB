@@ -1,12 +1,6 @@
 *
 *header for data structures and prototypes
 *
-#pragma once
-
-/* a few physical constants */
-const double kboltz=0.0019872067;     /* boltzman constant in kcal/mol/K */
-const double mvsq2e=2390.05736153349; /* m*v^2 in kcal/mol */
-
 
 /* structure to hold the complete information
  * about the MD system */
@@ -19,3 +13,21 @@ struct _mdsys {
     double *fx, *fy, *fz;
 };
 typedef struct _mdsys mdsys_t;
+
+#ifndef protos
+#ifdef __cplusplus
+extern "C" {
+    #endif
+    #define protos
+    static int get_a_line(FILE *fp, char *buf);
+    static double wallclock();
+    static void azzero(double *d, const int n);
+    static double pbc(double x, const double boxby2);
+    static void ekin(mdsys_t *sys);
+    static void force(mdsys_t *sys);
+    static void velverlet(mdsys_t *sys);
+    static void output(mdsys_t *sys, FILE *erg, FILE *traj)
+    #ifdef __cplusplus
+    }
+    #endif
+#endif
