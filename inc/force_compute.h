@@ -1,4 +1,4 @@
-#include structs.h
+#include "structs.h"
 
 #ifndef FORCE_COMPUTE_H
 #define FORCE_COMPUTE_H
@@ -6,8 +6,8 @@
   extern "C" {
    #endif
 
-    void ekin(mdsys_t *)
-    void force(mdsys_t *)
+    void ekin(mdsys_t *);
+    void force(mdsys_t *);
 
   
   #ifdef __cplusplus
