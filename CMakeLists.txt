@@ -1,9 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
 project(project VERSION 1.0 LANGUAGES CXX C)
+# Set policy to silence Warnings about timestamps of downloaded files.
+# Review occasionally if it may be set to NEW
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 OLD)
+endif()
+
 
 add_executable(MAIN.x src/main.cpp)
 
 add_library(Timer inc/Timer.hpp)
+set_target_properties(Timer PROPERTIES LINKER_LANGUAGE CXX)
 
 target_link_libraries(MAIN.x Timer)
 
@@ -11,7 +18,7 @@ target_link_libraries(MAIN.x Timer)
 
 
 
-add_library(mdlib src/utils.c src/verlet.c)
+add_library(mdlib util/utils.c src/verlet.c)
 
 
 

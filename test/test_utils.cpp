@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "utl.c"
+#include "utils.c"
 TEST(TestAzzero, doubles) {
   double *buf = new double[10];
   for (int i=0; i<10; ++i) buf[i]=i+1;
