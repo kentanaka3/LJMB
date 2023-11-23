@@ -1,4 +1,11 @@
-#include "structs_prots.hpp"
+#include "structs.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <math.h>
+#include <sys/time.h>
 
 void init(){
     /* read input file */
