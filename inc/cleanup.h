@@ -1,5 +1,4 @@
 #include "structs.h"
-#include "structs.h"
 #include <stdio.h>
 
 #ifndef CLEANUP_H
