@@ -4,20 +4,19 @@
 #include <stdlib.h>
 #include <math.h>
 #include "Timer.hpp"
-#include "structs_protos.hpp"
+#include "structs.hpp"
 
 #ifdef MY_MPI
-#include <mpi.h>
+  #include "myMPI.hpp"
 #endif
 
 
 int main(int argc, char *argv[]) {
-#ifdef MY_MPI
-int mype, npes;
+  #ifdef MY_MPI
     MPI_Init(&argc, &argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &mype);
-    MPI_Comm_size(MPI_COMM_WORLD, &npes);
-#endif
+    MPI_Comm_rank(MPI_COMM_WORLD, &myPE);
+    MPI_Comm_size(MPI_COMM_WORLD, &nPEs);
+  #endif
 
   int nprint, i;
   char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
@@ -128,8 +127,7 @@ int mype, npes;
     free(sys.fz);
 
     #ifdef MY_MPI
-        MPI_Finalize();
+      MPI_Finalize();
     #endif
-
     return 0;
 }
