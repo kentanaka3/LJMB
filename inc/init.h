@@ -1,12 +1,12 @@
- #ifndef INIT_H
-  #define _H
-    #ifdef __cplusplus
-    extern "C" {
-     #endif
+#ifndef INIT_H
+#define INIT_H
+  #ifdef __cplusplus
+  extern "C" {
+   #endif
+      
+    void init(mdsys_t sys);
   
-      void init();
-  
-    #ifdef __cplusplus
-      }
-     #endif
- #endif
+  #ifdef __cplusplus
+    }
+   #endif
+#endif
