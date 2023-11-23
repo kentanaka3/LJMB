@@ -1,4 +1,4 @@
-#include "structs_prots.hpp"
+#include "structs.hpp"
 
 void init(){
     /* read input file */
