@@ -4,7 +4,7 @@
   extern "C" {
    #endif
       
-    void init(mdsys_t sys);
+    void init(mdsys_t);
   
   #ifdef __cplusplus
     }
