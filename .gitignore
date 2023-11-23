@@ -12,3 +12,4 @@ _deps
 *.kdev4
 *.kdev4*
 *build*
+.vscode
