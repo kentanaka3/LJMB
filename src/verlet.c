@@ -28,6 +28,8 @@ void velverlet(mdsys_t *sys) {
 void velverlet_prop(mdsys_t *sys){
   /* second part: propagate velocities by another half step */
   int i;
+  /*call the first part*/
+  velverlet(sys);
   for (i = 0; i < sys->natoms; ++i) {
     sys->vx[i] += 0.5*sys->dt / mvsq2e * sys->fx[i] / sys->mass;
     sys->vy[i] += 0.5*sys->dt / mvsq2e * sys->fy[i] / sys->mass;
