@@ -7,7 +7,7 @@
   extern "C" {
    #endif
       
-    void cleanup(FILE *,FILE *,mdsys_t);
+    void cleanup(FILE *,FILE *,mdsys_t *);
   
   #ifdef __cplusplus
     }
