@@ -22,14 +22,14 @@ void velverlet(mdsys_t *sys) {
   
   /* compute forces and potential energy */
   force(sys);
+  /*call the second part to propagate*/
+  velverlet_prop(sys);
 }
 
 /*velocity verlet part two*/
 void velverlet_prop(mdsys_t *sys){
   /* second part: propagate velocities by another half step */
   int i;
-  /*call the first part*/
-  velverlet(sys);
   for (i = 0; i < sys->natoms; ++i) {
     sys->vx[i] += 0.5*sys->dt / mvsq2e * sys->fx[i] / sys->mass;
     sys->vy[i] += 0.5*sys->dt / mvsq2e * sys->fy[i] / sys->mass;

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "structs.h"
-#include <stdio.h>
 
 /* Append Data to output. */
 void output(mdsys_t sys, FILE *erg, FILE *traj) {
