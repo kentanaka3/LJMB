@@ -1,5 +1,5 @@
 /*
-*header for data structures and prototypes
+*header for data structures
 */
 
 /* structure to hold the complete information

@@ -1,4 +1,4 @@
-#include "structs.hpp"
+#include "structs.h"
 
 /* append data to output. */
 void output(mdsys_t *sys, FILE *erg, FILE *traj) {
