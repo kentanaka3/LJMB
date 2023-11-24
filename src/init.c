@@ -7,12 +7,9 @@
 #include <math.h>
 #include <sys/time.h>
 
-void init(){
-  int nprint, i;
-  char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
-  mdsys_t sys;
+void init(mdsys_t sys, char trajfile[], char ergfile[], int *nprint){
+  char restfile[BLEN], line[BLEN];
   FILE *fp;
-
   /* read input file */
   if (get_a_line(stdin, line)) exit(1);
   sys.natoms = atoi(line);
@@ -35,6 +32,7 @@ void init(){
   sys.dt = atof(line);
   if (get_a_line(stdin, line)) exit(1);
   nprint = atoi(line);
+
   /* allocate memory */
   sys.rx = (double *)malloc(sys.natoms*sizeof(double));
   sys.ry = (double *)malloc(sys.natoms*sizeof(double));
@@ -49,13 +47,14 @@ void init(){
   /* read restart */
   fp = fopen(restfile, "r");
   if (fp) {
-    for (i = 0; i < sys.natoms; ++i) {
+    for (int i = 0; i < sys.natoms; ++i) {
       fscanf(fp, "%lf%lf%lf", sys.rx + i, sys.ry + i, sys.rz + i);
     }
-    for (i = 0; i < sys.natoms; ++i) {
+    for (int i = 0; i < sys.natoms; ++i) {
       fscanf(fp, "%lf%lf%lf", sys.vx + i, sys.vy + i, sys.vz + i);
     }
     fclose(fp);
+    //
     azzero(sys.fx, sys.natoms);
     azzero(sys.fy, sys.natoms);
     azzero(sys.fz, sys.natoms);
