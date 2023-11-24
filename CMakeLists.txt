@@ -14,38 +14,11 @@ target_include_directories(MAIN.x PUBLIC inc)
 add_library(Timer inc/Timer.hpp)
 set_target_properties(Timer PROPERTIES LINKER_LANGUAGE CXX)
 
-add_library(init src/init.c)
-set_target_properties(init PROPERTIES LINKER_LANGUAGE C)
-target_include_directories(init PUBLIC inc)
+add_library(mdlib src/comp.c src/verlet.c src/output.c src/utils.c src/init.c)
+target_include_directories(mdlib PUBLIC inc)
+target_link_libraries(mdlib Timer)
 
-add_library(structs inc/structs.h)
-set_target_properties(structs PROPERTIES LINKER_LANGUAGE C)
-target_include_directories(structs PUBLIC inc)
-
-add_library(utils util/utils.c)
-set_target_properties(utils PROPERTIES LINKER_LANGUAGE C)
-target_include_directories(utils PUBLIC inc)
-
-add_library(output src/output.c)
-set_target_properties(output PROPERTIES LINKER_LANGUAGE C)
-target_include_directories(output PUBLIC inc)
-
-add_library(comp src/comp.c)
-set_target_properties(comp PROPERTIES LINKER_LANGUAGE C)
-target_include_directories(comp PUBLIC inc)
-
-add_library(verlet src/verlet.c)
-set_target_properties(verlet PROPERTIES LINKER_LANGUAGE C)
-target_include_directories(verlet PUBLIC inc)
-
-target_link_libraries(utils structs)
-target_link_libraries(output structs)
-target_link_libraries(comp structs utils)
-target_link_libraries(init structs utils)
-target_link_libraries(MAIN.x Timer init structs output comp verlet)
-
-
-add_library(mdlib util/utils.c src/verlet.c)
+target_link_libraries(MAIN.x mdlib)
 
 option(MY_MPI "Enable MPI calls" OFF)
 if(MY_MPI)

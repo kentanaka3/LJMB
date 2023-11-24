@@ -5,7 +5,7 @@ class VerletTest:
   public::testing::Test {
     protected:
     mdsys_t * sys;
-    void Setup() {
+    void SetUp() {
       sys = new mdsys_t;
       sys->natoms = 2;
       sys->mass = 1.0;
@@ -31,7 +31,7 @@ class VerletTest:
     ASSERT_NE(sys, nullptr);
     ASSERT_DOUBLE_EQ(sys->rx[0], -1.0);
     ASSERT_DOUBLE_EQ(sys->vx[0], 0.0);
-    verlet_1(sys);
+    velverlet(sys);
     ASSERT_DOUBLE_EQ(sys->rx[0],-0.5);
     ASSERT_DOUBLE_EQ(sys->vx[0], 0.5);
   }
@@ -40,7 +40,7 @@ class VerletTest:
     ASSERT_NE(sys,nullptr);
     ASSERT_DOUBLE_EQ(sys->rx[0], -1.0);
     ASSERT_DOUBLE_EQ(sys->vx[0], 0.0);
-    verlet_2(sys);
+    velverlet_prop(sys);
     ASSERT_DOUBLE_EQ(sys->rx[0], -1.0);
     ASSERT_DOUBLE_EQ(sys->vx[0], 0.5);
   }

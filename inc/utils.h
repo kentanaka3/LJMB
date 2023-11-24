@@ -6,7 +6,7 @@
   #ifdef __cplusplus
   extern "C" {
   #endif
-  static int get_a_line(FILE *, char *);
+  int get_a_line(FILE *, char *);
   void azzero(double *, const int);
   double pbc(double, const double);
   #ifdef __cplusplus

@@ -17,7 +17,7 @@ double pbc(double x, const double boxby2) {
   return x;
 }
 
-static int get_a_line(FILE *fp, char *buf) {
+int get_a_line(FILE *fp, char *buf) {
   char tmp[BLEN], *ptr;
   /* read a line and cut of comments and blanks */
   if (fgets(tmp, BLEN, fp)) {
