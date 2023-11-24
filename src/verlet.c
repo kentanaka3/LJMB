@@ -7,7 +7,7 @@
 #include <sys/time.h>
 
 /* velocity verlet part one*/
-void velverlet_part1(mdsys_t *sys) {
+void velverlet(mdsys_t *sys) {
   int i;
 
   /* first part: propagate velocities by half and positions by full step */
@@ -25,9 +25,11 @@ void velverlet_part1(mdsys_t *sys) {
 }
 
 /*velocity verlet part two*/
-void velverlet_part2(mdsys_t *sys){
+void velverlet_prop(mdsys_t *sys){
   /* second part: propagate velocities by another half step */
   int i;
+  /*call the first part*/
+  velverlet(sys);
   for (i = 0; i < sys->natoms; ++i) {
     sys->vx[i] += 0.5*sys->dt / mvsq2e * sys->fx[i] / sys->mass;
     sys->vy[i] += 0.5*sys->dt / mvsq2e * sys->fy[i] / sys->mass;
