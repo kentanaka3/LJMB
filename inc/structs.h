@@ -6,10 +6,8 @@
   #define BLEN 200
   #define LJMD_VERSION 1.0
 
-  /* a few physical constants */
-  #define KBOLTZ 0.0019872067     /* Boltzman constant in kcal/mol/K */
-  #define MVSQ2E 2390.05736153349 /* m*v^2 in kcal/mol */
-
+  extern const double KBOLTZ;
+  extern const double MVSQ2E;
   /* structure to hold the complete information about the MD system */
   struct _mdsys {
     int natoms,nfi,nsteps;

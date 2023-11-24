@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int nprint){
+void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
   char restfile[BLEN], line[BLEN];
   FILE *fp;
   /* read input file */
@@ -27,7 +27,7 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int nprint){
   if (get_a_line(stdin, line)) exit(1);
   sys->dt = atof(line);
   if (get_a_line(stdin, line)) exit(1);
-  nprint = atoi(line);
+  *nprint = atoi(line);
 
   /* allocate memory */
   sys->rx = (double *)malloc(sys->natoms*sizeof(double));

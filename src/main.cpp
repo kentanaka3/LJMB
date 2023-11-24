@@ -9,6 +9,7 @@
 #include "output.h"
 #include "comp.h"
 #include "verlet.h"
+#include "structs.h"
 #ifdef MY_MPI
   #include "myMPI.hpp"
 #endif
