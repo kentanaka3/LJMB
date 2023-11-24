@@ -9,18 +9,35 @@ endif()
 option(LJMD_VERSION "LJMD Version" 1.0)
 
 add_executable(MAIN.x src/main.cpp)
+target_include_directories(MAIN.x PUBLIC inc)
 
 add_library(Timer inc/Timer.hpp)
 set_target_properties(Timer PROPERTIES LINKER_LANGUAGE CXX)
 
-target_link_libraries(MAIN.x Timer)
+add_library(init src/init.c)
+set_target_properties(init PROPERTIES LINKER_LANGUAGE C)
+target_include_directories(init PUBLIC inc)
 
+add_library(structs src/structs.c)
+set_target_properties(structs PROPERTIES LINKER_LANGUAGE C)
+target_include_directories(structs PUBLIC inc)
 
+add_library(output src/output.c)
+set_target_properties(output PROPERTIES LINKER_LANGUAGE C)
+target_include_directories(output PUBLIC inc)
 
+add_library(force_compute src/force_compute.c)
+set_target_properties(force_compute PROPERTIES LINKER_LANGUAGE C)
+target_include_directories(force_compute PUBLIC inc)
+
+add_library(verlet src/verlet.c)
+set_target_properties(verlet PROPERTIES LINKER_LANGUAGE C)
+target_include_directories(verlet PUBLIC inc)
+
+target_link_libraries(MAIN.x Timer init structs output force_compute verlet)
 
 
 add_library(mdlib util/utils.c src/verlet.c)
-
 
 option(MY_MPI "Enable MPI calls" OFF)
 if(MY_MPI)

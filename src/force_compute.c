@@ -1,25 +1,21 @@
 #include "structs.h"
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <math.h>
-#include <sys/time.h>
 
-/* compute kinetic energy */
-void ekin(mdsys_t *sys)
-{
-    int i;
-
-    sys->ekin=0.0;
-    for (i=0; i<sys->natoms; ++i) {
-        sys->ekin += 0.5*mvsq2e*sys->mass*(sys->vx[i]*sys->vx[i] + sys->vy[i]*sys->vy[i] + sys->vz[i]*sys->vz[i]);
-    }
-    sys->temp = 2.0*sys->ekin/(3.0*sys->natoms-3.0)/kboltz;
+/* Compute Kinetic Energy */
+void ekin(mdsys_t *sys) {
+  sys->ekin=0.0;
+  for (int i = 0; i < sys->natoms; ++i) {
+    sys->ekin += 0.5*mvsq2e*sys->mass*(sys->vx[i]*sys->vx[i] + \
+                                       sys->vy[i]*sys->vy[i] + \
+                                       sys->vz[i]*sys->vz[i]);
+  }
+  sys->temp = 2.0*sys->ekin/(3.0*sys->natoms - 3.0)/kboltz;
 }
 
 /* compute forces */
-void force(mdsys_t* sys) {
+void force(mdsys_t sys) {
   double r, ffac;
   double rx, ry, rz;
   int i, j;
@@ -45,10 +41,10 @@ void force(mdsys_t* sys) {
       /* compute force and energy if within cutoff */
       if (r < sys->rcut) {
         ffac = -4.0*sys->epsilon*(-12.0*pow(sys->sigma/r, 12.0)/r
-                                  +6*pow(sys->sigma/r, 6.0)/r);
+                                  + 6*pow(sys->sigma/r, 6.0)/r);
 
         sys->epot += 0.5*4.0*sys->epsilon*(pow(sys->sigma/r, 12.0)
-                                           -pow(sys->sigma/r, 6.0));
+                                           - pow(sys->sigma/r, 6.0));
 
         sys->fx[i] += rx/r*ffac;
         sys->fy[i] += ry/r*ffac;
