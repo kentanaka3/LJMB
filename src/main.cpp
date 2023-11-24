@@ -49,6 +49,10 @@ int main(int argc, char *argv[]) {
     if ((sys.nfi % nprint) == 0) output(&sys, erg, traj);
     /* propagate system and recompute energies */
     velverlet(&sys);
+    /* compute forces and potential energy */
+    force(&sys);
+    /*call the second part to propagate*/
+    velverlet_prop(&sys);
     ekin(&sys);
   }
   }
