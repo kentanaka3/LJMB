@@ -1,12 +1,12 @@
 #include "structs.h"
-#include <stdio.h>
 
-#ifndef CLEANUP_H
-#define CLEANUP_H
+#ifndef COMPUTE_H
+  #define COMPUTE_H
   #ifdef __cplusplus
   extern "C" {
   #endif
-  void cleanup(FILE *,FILE *,mdsys_t);
+  void ekin(mdsys_t *);
+  void force(mdsys_t *);
   #ifdef __cplusplus
   }
   #endif

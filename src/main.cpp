@@ -7,7 +7,7 @@
 #include "structs.h"
 #include "init.h"
 #include "output.h"
-#include "force_compute.h"
+#include "comp.h"
 #include "verlet.h"
 #ifdef MY_MPI
   #include "myMPI.hpp"
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
   printf("LJMD version %3.1f\n", LJMD_VERSION);
   {CSimpleTimer t{"Startup Time"};
-  init(sys, trajfile, ergfile, (int *)nprint);
+  initialize(&sys, trajfile, ergfile, &nprint);
 
   /* Initialize Forces and Energies.*/
   sys.nfi = 0;

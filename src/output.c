@@ -2,7 +2,7 @@
 #include "structs.h"
 
 /* Append Data to output. */
-void output(mdsys_t sys, FILE *erg, FILE *traj) {
+void output(mdsys_t * sys, FILE *erg, FILE *traj) {
   printf("%8d %20.8f %20.8f %20.8f %20.8f\n",
          sys->nfi, sys->temp, sys->ekin, sys->epot, sys->ekin + sys->epot);
   fprintf(erg, "%8d %20.8f %20.8f %20.8f %20.8f\n",

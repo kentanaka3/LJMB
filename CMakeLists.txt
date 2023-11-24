@@ -18,23 +18,31 @@ add_library(init src/init.c)
 set_target_properties(init PROPERTIES LINKER_LANGUAGE C)
 target_include_directories(init PUBLIC inc)
 
-add_library(structs src/structs.c)
+add_library(structs inc/structs.h)
 set_target_properties(structs PROPERTIES LINKER_LANGUAGE C)
 target_include_directories(structs PUBLIC inc)
+
+add_library(utils util/utils.c)
+set_target_properties(utils PROPERTIES LINKER_LANGUAGE C)
+target_include_directories(utils PUBLIC inc)
 
 add_library(output src/output.c)
 set_target_properties(output PROPERTIES LINKER_LANGUAGE C)
 target_include_directories(output PUBLIC inc)
 
-add_library(force_compute src/force_compute.c)
-set_target_properties(force_compute PROPERTIES LINKER_LANGUAGE C)
-target_include_directories(force_compute PUBLIC inc)
+add_library(comp src/comp.c)
+set_target_properties(comp PROPERTIES LINKER_LANGUAGE C)
+target_include_directories(comp PUBLIC inc)
 
 add_library(verlet src/verlet.c)
 set_target_properties(verlet PROPERTIES LINKER_LANGUAGE C)
 target_include_directories(verlet PUBLIC inc)
 
-target_link_libraries(MAIN.x Timer init structs output force_compute verlet)
+target_link_libraries(utils structs)
+target_link_libraries(output structs)
+target_link_libraries(comp structs utils)
+target_link_libraries(init structs utils)
+target_link_libraries(MAIN.x Timer init structs output comp verlet)
 
 
 add_library(mdlib util/utils.c src/verlet.c)
