@@ -8,6 +8,11 @@
 #include <sys/time.h>
 
 void init(){
+  int nprint, i;
+  char restfile[BLEN], trajfile[BLEN], ergfile[BLEN], line[BLEN];
+  mdsys_t sys;
+  FILE *fp;
+
   /* read input file */
   if (get_a_line(stdin, line)) exit(1);
   sys.natoms = atoi(line);
