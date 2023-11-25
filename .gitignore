@@ -16,5 +16,9 @@ _deps
 *.o
 .vscode
 *.vscode*
-*.xyz
+data/*.xyz
 *.dat
+!data/refs/argon_108.dat
+!data/refs/argon_2916.dat
+!data/refs/argon_78732.dat
+*.out

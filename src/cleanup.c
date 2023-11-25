@@ -1,9 +1,10 @@
 #include "structs.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 /* clean up: close files, free memory */
 void cleanup(FILE *erg, FILE *traj, mdsys_t sys) {
-  printf("Simulation Done.");
+  printf("Simulation Done.\n");
   fclose(erg);
   fclose(traj);
 

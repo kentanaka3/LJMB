@@ -16,6 +16,7 @@ struct TimerData{
 std::map<std::string, TimerData> timeTable;
 void print_timing_results() {
   #ifdef MY_MPI
+  std::cout << "TIMING RESULTS:" << std::endl;
   extern int myPE, nPEs;
   auto sample = timeTable.begin() -> second.t.count();
   std::vector<decltype(sample)> times;
@@ -45,6 +46,7 @@ void print_timing_results() {
     }
   }
   #else
+  std::cout << "TIMING RESULTS:" << std::endl;
   for (const auto & pair : timeTable) {
     std::cout << pair.first << ": " << pair.second.calls << std::endl;
     std::cout << pair.second.t.count() << std::endl;

@@ -66,6 +66,7 @@ int main(int argc, char *argv[]) {
   }
   }
   cleanup(erg, traj, sys);
+  print_timing_results();
   #ifdef MY_MPI
     MPI_Finalize();
   #endif
