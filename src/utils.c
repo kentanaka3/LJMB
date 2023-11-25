@@ -7,7 +7,7 @@
 
 /* helper function: zero out an array */
 void azzero(double *d, const int n) {
-  for (int i = 0; i < n; ++i) d[i]=0.0;
+  for (int i = 0; i < n; ++i) d[i] = 0.0;
 }
 
 /* helper function: apply minimum image convention */
