@@ -1,19 +1,24 @@
 import os
 import re
 import sys
+atom = re.compile( r"^Starting simulation with (?P<atoms>\d+)")
+z = 0
 m = re.compile(r"^(?P<name>\w+):\s(?P<calls>\d+)")
-n = re.compile(r"(\d+) ")
-M = [[[0 for _ in range(int(sys.argv[3]))]
-         for _ in range(int(sys.argv[2]))]
-         for _ in range(int(sys.argv[4]))]
+n = re.compile(r"(\d+) *")
 x = 0
 y = 0
-for i in sorted(os.listdir(sys.argv[1]), reverse=False):
+M = {}
+pathname = os.path.join("Timer", sys.argv[1])
+for i in sorted(os.listdir(pathname), reverse=False):
   if i.startswith("out"):
     Timing = {}
-    with open(os.path.join(sys.argv[1], i), 'r') as fr:
+    with open(os.path.join(pathname, i), 'r') as fr:
       L = fr.readline()
-      while (re.match("TIMING RESULTS:")):
+      while (not re.match(L, "- TIMING RESULTS -\n")):
+        atoms = atom.match(L)
+        if atoms:
+          z = int(atoms.group("atoms"))
+          M[z] = dict()
         L = fr.readline()
       L = fr.readlines()
     name = ""
@@ -27,15 +32,18 @@ for i in sorted(os.listdir(sys.argv[1]), reverse=False):
         a = max(a)
         if Timing[name][1] < a:
           Timing[name][1] = a
-    for l, j in enumerate(Timing.items()):
-      M[l][y][x] = j[1][1]
-    print(y, x)
-    x += 1
-    y += int(x / 3)
-    x %= 3
-for i in range(int(sys.argv[4])):
-  for j in range(int(sys.argv[2])):
-    for k in reversed(range(int(sys.argv[3]))):
-      print(M[i][j][k], end=" ")
-    print("")
-  print("")
+    M[z] = Timing
+x = list(M.keys())
+y = [0]*len(x)
+titles = [title for title in M[x[0]]]
+for t in titles:
+  with open(os.path.join(pathname, t + ".dat"), 'w') as fr:
+    fr.write("# " + t + "\n")
+for t in titles:
+  with open(os.path.join(pathname, t + ".dat"), 'a') as fr:
+    for i, j in enumerate(x):
+      y[i] = M[j][t][1]/M[j][t][0]
+      fr.write(str(j) + "\t" + str(y[i]) + "\n")
+
+for t in titles:
+  os.system("gnuplot -c Timer.plt " + t + " " + sys.argv[1])

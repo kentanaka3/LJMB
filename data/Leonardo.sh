@@ -2,7 +2,7 @@
 
 #SBATCH --job-name="LJMB # #"
 #SBATCH --nodes=#
-#SBATCH --ntasks-per-node=#
+#SBATCH --tasks-per-node=#
 #SBATCH --cpus-per-task=#
 #SBATCH  -A ICT23_MHPC
 #SBATCH --time 1:00:00

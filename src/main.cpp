@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
   traj = fopen(trajfile, "w");
   output(&sys, erg, traj);
 
-  {CSimpleTimer t{"Run Time"};
+  {CSimpleTimer t{"RunTime"};
   /* Main MD loop */
   for (sys.nfi = 1; sys.nfi <= sys.nsteps; ++sys.nfi) {
     /* write output, if requested */
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     {CSimpleTimer t{"Propagate"};
     velverlet_prop(&sys);
     }
-    {CSimpleTimer t{"Kinetic Energy"};
+    {CSimpleTimer t{"KineticEnergy"};
     ekin(&sys);
     }
   }
