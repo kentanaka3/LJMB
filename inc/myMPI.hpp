@@ -2,4 +2,4 @@
 #ifndef MY_MPI
   #define MY_MPI
 #endif
-int myPE, nPEs, n_loc, rest, tmp;
+int mype, npes, n_loc, rest, tmp;
