@@ -16,3 +16,5 @@ _deps
 *.o
 .vscode
 *.vscode*
+*.xyz
+*.dat
