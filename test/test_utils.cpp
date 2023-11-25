@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
-#include "utils.c"
+#include "utils.h"
+#include "structs.h"
 TEST(TestAzzero, doubles) {
   double *buf = new double[10];
   for (int i = 0; i < 10; ++i) buf[i] = i + 1;
@@ -13,7 +14,7 @@ TEST(TestAzzero, doubles) {
   ASSERT_DOUBLE_EQ(buf[9], 0.0);
 }
 
-class VerletTest:
+class PBCTest:
   public::testing::Test {
     protected:
     mdsys_t * sys;
@@ -23,13 +24,13 @@ class VerletTest:
       sys->rx = new double[2];
       sys->ry = new double[2];
       sys->rz = new double[2];
-      sys->rx[0] = -1.0;
-      sys->rx[1] = 1.0;
-      sys->ry[0] = -1.0;
-      sys->ry[1] = 1.0;
-      sys->rz[0] = -1.0;
-      sys->rz[1] = 1.0;
-      sys->10;
+      sys->rx[0] = -6.0;
+      sys->rx[1] = 6.0;
+      sys->ry[0] = -6.0;
+      sys->ry[1] = 6.0;
+      sys->rz[0] = -6.0;
+      sys->rz[1] = 6.0;
+      sys->box=10;
     }
     void TearDown() {
       delete[] sys->rx;
@@ -40,11 +41,12 @@ class VerletTest:
     }
   };
 
-TEST(TestPBC, doubles) {
+TEST_F(PBCTest, doubles) {
     int i=0;
     int j=1;
-    rx=pbc(sys->rx[i] - sys->rx[j], 0.5*sys->box);
-    ry=pbc(sys->ry[i] - sys->ry[j], 0.5*sys->box);
-    rz=pbc(sys->rz[i] - sys->rz[j], 0.5*sys->box);
-    ASSERT_DOUBLE_EQ(rx*rx+ry*ry+rz*rz,192);
+    ASSERT_NE(sys,nullptr);
+    double rx=pbc(sys->rx[i] - sys->rx[j], 0.5*sys->box);
+    double ry=pbc(sys->ry[i] - sys->ry[j], 0.5*sys->box);
+    double rz=pbc(sys->rz[i] - sys->rz[j], 0.5*sys->box);
+    ASSERT_DOUBLE_EQ(rx*rx+ry*ry+rz*rz,12);
 }
