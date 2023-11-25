@@ -21,4 +21,5 @@ data/*.xyz
 !data/refs/argon_2916.dat
 !data/refs/argon_78732.dat
 *.out
-!Timer
+*.err
+!data/Timer/*/*.dat
