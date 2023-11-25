@@ -1,6 +1,9 @@
 #include "structs.h"
 #include "comp.h"
 #include <math.h>
+#ifdef _OPENMP
+ #include <omp.h>
+#endif
 
 /*velocity verlet part two*/
 void velverlet_prop(mdsys_t *sys){
