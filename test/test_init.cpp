@@ -70,6 +70,3 @@ class VerletTest:
     ASSERT_DOUBLE_EQ(sys->rx[0], -1.0);
     ASSERT_DOUBLE_EQ(sys->vx[0], 0.5);
   }
-
-
-  
