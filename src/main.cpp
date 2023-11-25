@@ -10,6 +10,7 @@
 #include "comp.h"
 #include "verlet.h"
 #include "structs.h"
+#include "cleanup.h"
 #ifdef MY_MPI
   #include "myMPI.hpp"
 #endif
@@ -48,29 +49,23 @@ int main(int argc, char *argv[]) {
     /* write output, if requested */
     if ((sys.nfi % nprint) == 0) output(&sys, erg, traj);
     /* propagate system and recompute energies */
+    {CSimpleTimer t{"Velverlet"};
     velverlet(&sys);
+    }
     /* compute forces and potential energy */
+    {CSimpleTimer t{"Force"};
     force(&sys);
+    }
     /*call the second part to propagate*/
+    {CSimpleTimer t{"Propagate"};
     velverlet_prop(&sys);
+    }
+    {CSimpleTimer t{"Kinetic Energy"};
     ekin(&sys);
+    }
   }
   }
-  /* Clean up: close files, free memory */
-  printf("Simulation Done.");
-  fclose(erg);
-  fclose(traj);
-
-  free(sys.rx);
-  free(sys.ry);
-  free(sys.rz);
-  free(sys.vx);
-  free(sys.vy);
-  free(sys.vz);
-  free(sys.fx);
-  free(sys.fy);
-  free(sys.fz);
-
+  cleanup(erg, traj, sys);
   #ifdef MY_MPI
     MPI_Finalize();
   #endif
