@@ -3,6 +3,9 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <math.h>
+#ifdef _OPENMP
+ #include <omp.h>
+#endif
 
 /* Compute Kinetic Energy */
 void ekin(mdsys_t *sys) {
