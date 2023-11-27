@@ -20,6 +20,9 @@ target_link_libraries(mdlib Timer)
 
 target_link_libraries(MAIN.x mdlib)
 
+# Add optimization flags to mdlib
+#target_compile_options(mdlib PRIVATE -O3)
+
 option(MY_MPI "Enable MPI calls" OFF)
 if(MY_MPI)
   add_library(myMPI inc/myMPI.hpp)

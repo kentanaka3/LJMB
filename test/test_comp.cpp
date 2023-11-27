@@ -21,10 +21,10 @@ class ComputationsTest:
       sys->temp = 0.0;
       sys->box = 10.0;
       sys->rcut = 10.0;
-      sys->epsilon = 2.0*sqrt(3);
-      sys->sigma = 2.0*sqrt(3);
+      sys->epsilon = 2.0*sqrt(3.0);
+      sys->sigma = 2.0*sqrt(3.0);
       sys->epot = 0.0;
-
+//      double c6 = 13824*SQRT(3.0)
       sys->dt = MVSQ2E;
       sys->rx = new double[2];
       sys->vx = new double[2];
@@ -88,13 +88,13 @@ class ComputationsTest:
     ASSERT_DOUBLE_EQ(sys->epot, 0.0);
 
     force(sys);
-    ASSERT_DOUBLE_EQ(sys->epot, 0.0);
     ASSERT_DOUBLE_EQ(sys->fx[0], -24.0/sqrt(3));
     ASSERT_DOUBLE_EQ(sys->fx[1], 24.0/sqrt(3));
     ASSERT_DOUBLE_EQ(sys->fy[0], -24.0/sqrt(3));
     ASSERT_DOUBLE_EQ(sys->fy[1], 24.0/sqrt(3));
     ASSERT_DOUBLE_EQ(sys->fz[0], -24.0/sqrt(3));
     ASSERT_DOUBLE_EQ(sys->fz[1], 24.0/sqrt(3));
+    ASSERT_DOUBLE_EQ(sys->epot, 0.0);
   }
 
 
