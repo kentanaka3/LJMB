@@ -20,7 +20,7 @@ void ekin(mdsys_t *sys) {
 
 /* compute forces */
 void force(mdsys_t *sys) {
-  double rsq, ffac, epot;
+  double rsq, ffac;
   double rx, ry, rz;
   int i, j, ii;
   int tid=0;

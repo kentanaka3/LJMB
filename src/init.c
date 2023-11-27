@@ -1,14 +1,11 @@
 #include "structs.h"
 #include "utils.h"
 #include <stdlib.h>
-<<<<<<< HEAD
-#include <math.h>
 #ifdef MY_MPI
 #include "myMPI.hpp"
-=======
+#endif
 #ifdef _OPENMP
 #include <omp.h>
->>>>>>> openmp
 #endif
 
 void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
@@ -47,15 +44,7 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
   sys->fx = (double *)malloc(sys->natoms*sizeof(double));
   sys->fy = (double *)malloc(sys->natoms*sizeof(double));
   sys->fz = (double *)malloc(sys->natoms*sizeof(double));
-  sys->cx = (double *)malloc(sys->natoms*sizeof(double));
-  sys->cy = (double *)malloc(sys->natoms*sizeof(double));
-  sys->cz = (double *)malloc(sys->natoms*sizeof(double));
-  sys->nsize = 1;
-  sys->mpirank = 0;
-  #ifdef MY_MPI
-  sys->nsize = nPEs;
-  sys->mpirank = myPE;
-  #endif
+
   /* read restart */
   fp = fopen(restfile, "r");
   if (fp) {
