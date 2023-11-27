@@ -47,22 +47,23 @@ void force(mdsys_t *sys) {
     rcsq = sys->rcut*sys->rcut;
     for(i = 0; i < (sys->natoms) - 1; i+=sys->nthreads) {
       int ii=i+tid;
+      if (ii>=(sys->natoms-1)) break; 
       rx1=sys->rx[ii];
       ry1=sys->ry[ii];
-      rz1=sys->rz[ii]; 
-      if (ii>=(sys->natoms-1)) break;     
+      rz1=sys->rz[ii];  
       for(j = i + 1; j < (sys->natoms); ++j) {
         /* Get distance between particle i and j */
-        rx = pbc(sys->rx[i] - sys->rx[j], 0.5*sys->box);
-        ry = pbc(sys->ry[i] - sys->ry[j], 0.5*sys->box);
-        rz = pbc(sys->rz[i] - sys->rz[j], 0.5*sys->box);
+        rx = pbc(rx1 - sys->rx[j], 0.5*sys->box);
+        ry = pbc(ry1 - sys->ry[j], 0.5*sys->box);
+        rz = pbc(rz1 - sys->rz[j], 0.5*sys->box);
+
         rsq = rx*rx + ry*ry + rz*rz;
         double rinv = 1.0;
         for (int k = 0; k < 3; k++) rinv /= rsq;
         /* Compute Force and Energy if within cutoff */
         if (rsq < rcsq) {
           ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
-          sys->epot += (c12*rinv - c6)*rinv;
+          epot += (c12*rinv - c6)*rinv;
 
           sys->fx[i] += rx*ffac;
           sys->fy[i] += ry*ffac;
@@ -76,6 +77,7 @@ void force(mdsys_t *sys) {
     #ifdef _OPENMP
     #pragma omp barrier
     #endif
+    sys->epot += epot;
     i=1+(sys->natoms/sys->nthreads);
     fromidx=tid*i;
     toidx=fromidx+i;

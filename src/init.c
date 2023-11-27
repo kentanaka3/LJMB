@@ -1,7 +1,9 @@
 #include "structs.h"
 #include "utils.h"
 #include <stdlib.h>
-#include <math.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
   char restfile[BLEN], line[BLEN];
