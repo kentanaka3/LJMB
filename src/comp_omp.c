@@ -23,15 +23,19 @@ void force(mdsys_t *sys) {
   double r, ffac;
   double rx, ry, rz;
   int i, j;
+  int tid=0;
+  sys->nthreads;
+  int epot=0;
   #ifdef _OPENMP
-  #pragma omp parallel reduction(+:sys->epot)
+  #pragma omp parallel reduction(+:epot)
   #endif
   {
     double *fx,*fy,*fz; //auxiliary pointers
     double rx1,ry1,rz1;
     int fromidx,toidx;
+    int tid= 0;
     #ifdef _OPENMP
-      sys->nthreads=omp_get_num_threads(); //total number of threads
+      
       int tid=omp_get_thread_num(); //thread number as thread "rank"
     #else
       int tid=0; //to preserve serial behavior 
