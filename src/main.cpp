@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size(MPI_COMM_WORLD, &nPEs);
   #endif
 
-  int nprint, i;
+  int nprint;
   char trajfile[BLEN], ergfile[BLEN];
   FILE *traj, *erg;
   mdsys_t sys;

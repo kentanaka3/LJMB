@@ -1,9 +1,14 @@
 #include "structs.h"
 #include "utils.h"
 #include <stdlib.h>
+<<<<<<< HEAD
 #include <math.h>
 #ifdef MY_MPI
 #include "myMPI.hpp"
+=======
+#ifdef _OPENMP
+#include <omp.h>
+>>>>>>> openmp
 #endif
 
 void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){

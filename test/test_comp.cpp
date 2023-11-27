@@ -75,6 +75,7 @@ class ComputationsTest:
     ekin(sys);
     ASSERT_DOUBLE_EQ(sys->ekin, MVSQ2E);
     ASSERT_DOUBLE_EQ(sys->temp, 2.0*MVSQ2E/(3.0*KBOLTZ));
+    printf("gone here");
   }
 
   TEST_F(ComputationsTest, Force) {
@@ -85,6 +86,7 @@ class ComputationsTest:
     ASSERT_DOUBLE_EQ(sys->rx[1], 1.0);
     ASSERT_DOUBLE_EQ(sys->rx[0], -1.0);
     ASSERT_DOUBLE_EQ(sys->rx[1], 1.0);
+    printf("gone there x2");
     ASSERT_DOUBLE_EQ(sys->epot, -160.48438434);
     force(sys);
     ASSERT_DOUBLE_EQ(sys->epot, -0.084193223448705001);

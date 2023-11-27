@@ -11,7 +11,11 @@
   extern const double MVSQ2E;
   /* structure to hold the complete information about the MD system */
   struct _mdsys {
+<<<<<<< HEAD
     int natoms, nfi, nsteps, nsize, mpirank;
+=======
+    int natoms,nfi,nsteps,nthreads;
+>>>>>>> openmp
     double dt, mass, epsilon, sigma, box, rcut;
     double ekin, epot, temp;
     double *rx, *ry, *rz;
