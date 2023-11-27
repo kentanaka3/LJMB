@@ -8,6 +8,13 @@
 void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
   char restfile[BLEN], line[BLEN];
   FILE *fp;
+  /*initialize n threads*/
+  #ifdef _OPENMP
+  int nthreads = omp_get_max_threads();
+  sys->nthreads=nthreads;
+  #else
+  sys->nthreads=1;
+  #endif
   /* read input file */
   if (get_a_line(stdin, line)) exit(1);
   sys->natoms = atoi(line);

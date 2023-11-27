@@ -74,10 +74,10 @@ void force(mdsys_t *sys) {
         }
       }
     }
+    sys->epot = epot;
     #ifdef _OPENMP
     #pragma omp barrier
     #endif
-    sys->epot += epot;
     i=1+(sys->natoms/sys->nthreads);
     fromidx=tid*i;
     toidx=fromidx+i;
