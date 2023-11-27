@@ -4,8 +4,9 @@
 
   /* generic file- or pathname buffer length */
   #define BLEN 200
-  #define LJMD_VERSION 1.0
-
+  #ifndef LJMD_VERSION
+    #define LJMD_VERSION 1.0
+  #endif
   extern const double KBOLTZ;
   extern const double MVSQ2E;
   /* structure to hold the complete information about the MD system */
