@@ -19,22 +19,22 @@ class ComputationsTest:
       sys->mass = 1.0;
       sys->ekin = 0.0;
       sys->temp = 0.0;
-      sys->box = 10.0;
-      sys->rcut = 10.0;
-      sys->epsilon = 2.0*sqrt(3);
-      sys->sigma = 2.0*sqrt(3);
-      sys->epot = 0.0;
+      sys->box = 17.1580;
+      sys->rcut = 8.5;
+      sys->epsilon = 0.2379;
+      sys->sigma = 3.405;
+      sys->epot = -160.48438434;
 
       sys->dt = MVSQ2E;
-      sys->rx = new double[2];
-      sys->vx = new double[2];
-      sys->fx = new double[2];
-      sys->ry = new double[2];
-      sys->vy = new double[2];
-      sys->fy = new double[2];
-      sys->rz = new double[2];
-      sys->vz = new double[2];
-      sys->fz = new double[2];
+      sys->rx = new double[sys->natoms];
+      sys->vx = new double[sys->natoms];
+      sys->fx = new double[sys->natoms];
+      sys->ry = new double[sys->natoms];
+      sys->vy = new double[sys->natoms];
+      sys->fy = new double[sys->natoms];
+      sys->rz = new double[sys->natoms];
+      sys->vz = new double[sys->natoms];
+      sys->fz = new double[sys->natoms];
       sys->rx[0] = -1.0;
       sys->rx[1] = 1.0;
       sys->ry[0] = -1.0;
@@ -85,15 +85,15 @@ class ComputationsTest:
     ASSERT_DOUBLE_EQ(sys->rx[1], 1.0);
     ASSERT_DOUBLE_EQ(sys->rx[0], -1.0);
     ASSERT_DOUBLE_EQ(sys->rx[1], 1.0);
-    ASSERT_DOUBLE_EQ(sys->epot, 0.0);
+    ASSERT_DOUBLE_EQ(sys->epot, -160.48438434);
     force(sys);
-    ASSERT_DOUBLE_EQ(sys->epot, -6.315935428978668e-15);
-    ASSERT_DOUBLE_EQ(sys->fx[0], -13.856406460551002);
-    ASSERT_DOUBLE_EQ(sys->fx[1], 13.856406460551002);
-    ASSERT_DOUBLE_EQ(sys->fy[0], -13.856406460551002);
-    ASSERT_DOUBLE_EQ(sys->fy[1], 13.856406460551002);
-    ASSERT_DOUBLE_EQ(sys->fz[0], -13.856406460551002);
-    ASSERT_DOUBLE_EQ(sys->fz[1], 13.856406460551002);
+    ASSERT_DOUBLE_EQ(sys->epot, -0.084193223448705001);
+    ASSERT_DOUBLE_EQ(sys->fx[0], -0.68986272432173701);
+    ASSERT_DOUBLE_EQ(sys->fx[1], 0.68986272432173701);
+    ASSERT_DOUBLE_EQ(sys->fy[0], -0.68986272432173701);
+    ASSERT_DOUBLE_EQ(sys->fy[1], 0.68986272432173701);
+    ASSERT_DOUBLE_EQ(sys->fz[0], -0.68986272432173701);
+    ASSERT_DOUBLE_EQ(sys->fz[1], 0.68986272432173701);
   }
 
 

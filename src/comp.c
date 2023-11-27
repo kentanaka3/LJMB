@@ -1,8 +1,5 @@
 #include "structs.h"
 #include "utils.h"
-#include <ctype.h>
-#include <stdlib.h>
-#include <math.h>
 
 /* Compute Kinetic Energy */
 void ekin(mdsys_t *sys) {
@@ -26,7 +23,7 @@ void force(mdsys_t *sys) {
   azzero(sys->fx, sys->natoms);
   azzero(sys->fy, sys->natoms);
   azzero(sys->fz, sys->natoms);
-  double c6 = 1, c12, rcsq, rinv = 1;
+  double c6 = 1.0, c12, rcsq;
   for (i = 0; i < 6; i++) c6 *= sys->sigma;
   c12 = 4.0*sys->epsilon*c6*c6;
   c6 *= 4.0*sys->epsilon;
@@ -38,6 +35,7 @@ void force(mdsys_t *sys) {
       ry = pbc(sys->ry[i] - sys->ry[j], 0.5*sys->box);
       rz = pbc(sys->rz[i] - sys->rz[j], 0.5*sys->box);
       rsq = rx*rx + ry*ry + rz*rz;
+      double rinv = 1.0;
       for (int k = 0; k < 3; k++) rinv /= rsq;
       /* Compute Force and Energy if within cutoff */
       if (rsq < rcsq) {

@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   if (!myPE)
   #endif
   printf("Starting simulation with %d atoms for %d steps.\n" \
-         "\tNFI\tTEMP\tEKIN\tEPOT\tETOT\n", sys.natoms, sys.nsteps);
+         "\tNFI\t\tTEMP\t\tEKIN\t\t\tEPOT\t\t\tETOT\n", sys.natoms, sys.nsteps);
 
   erg = fopen(ergfile, "w");
   traj = fopen(trajfile, "w");
