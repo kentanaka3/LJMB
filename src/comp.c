@@ -1,5 +1,8 @@
 #include "structs.h"
 #include "utils.h"
+#ifdef MY_MPI
+#include "myMPI.hpp"
+#endif
 
 /* Compute Kinetic Energy */
 void ekin(mdsys_t *sys) {
@@ -14,22 +17,29 @@ void ekin(mdsys_t *sys) {
 
 /* compute forces */
 void force(mdsys_t *sys) {
-  double rsq, ffac;
+  double rsq, ffac, epot;
   double rx, ry, rz;
-  int i, j;
+  int i, j, ii;
 
   /* zero energy and forces */
-  sys->epot = 0.0;
-  azzero(sys->fx, sys->natoms);
-  azzero(sys->fy, sys->natoms);
-  azzero(sys->fz, sys->natoms);
+  epot = 0.0;
+  azzero(sys->cx, sys->natoms);
+  azzero(sys->cy, sys->natoms);
+  azzero(sys->cz, sys->natoms);
+  #ifdef MY_MPI
+  MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
+  MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
+  MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
+  #endif
   double c6 = 1.0, c12, rcsq;
   for (i = 0; i < 6; i++) c6 *= sys->sigma;
   c12 = 4.0*sys->epsilon*c6*c6;
   c6 *= 4.0*sys->epsilon;
   rcsq = sys->rcut*sys->rcut;
-  for(i = 0; i < (sys->natoms) - 1; ++i) {
-    for(j = i + 1; j < (sys->natoms); ++j) {
+  for (i = 0; i < (sys->natoms) - 1; i += sys->nsize) {
+    ii = i + sys->mpirank;
+    if (ii >= (sys->natoms - 1)) break;
+    for (j = i + 1; j < (sys->natoms); ++j) {
       /* Get distance between particle i and j */
       rx = pbc(sys->rx[i] - sys->rx[j], 0.5*sys->box);
       ry = pbc(sys->ry[i] - sys->ry[j], 0.5*sys->box);
@@ -45,10 +55,19 @@ void force(mdsys_t *sys) {
         sys->fx[i] += rx*ffac;
         sys->fy[i] += ry*ffac;
         sys->fz[i] += rz*ffac;
-        sys->fx[j] -= rx*ffac;
-        sys->fy[j] -= ry*ffac;
-        sys->fz[j] -= rz*ffac;
+        sys->cx[j] -= rx*ffac;
+        sys->cy[j] -= ry*ffac;
+        sys->cz[j] -= rz*ffac;
       }
     }
   }
+  #ifdef MY_MPI
+  MPI_Reduce(sys->cx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+             sys->mpicomm);
+  MPI_Reduce(sys->cy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+             sys->mpicomm);
+  MPI_Reduce(sys->cz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
+             sys->mpicomm);
+  MPI_Reduce(&epot, %sys->epot, 1, MPI_DOUBLE, MPI_SUM, 0, sys->mpicomm);
+  #endif
 }
