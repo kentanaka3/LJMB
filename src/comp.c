@@ -22,6 +22,11 @@ void force(mdsys_t *sys) {
   int i, j;
   int tid=0;
   double epot=0.0;
+  double c6 = 1.0, c12, rcsq;
+  for (i = 0; i < 6; i++) c6 *= sys->sigma;
+  c12 = 4.0*sys->epsilon*c6*c6;
+  c6 *= 4.0*sys->epsilon;
+  rcsq = sys->rcut*sys->rcut;
   #ifdef _OPENMP
   #pragma omp parallel reduction(+:epot)
   #endif
@@ -40,11 +45,6 @@ void force(mdsys_t *sys) {
     azzero(fy, sys->natoms);
     azzero(fz, sys->natoms);
 
-    double c6 = 1.0, c12, rcsq;
-    for (i = 0; i < 6; i++) c6 *= sys->sigma;
-    c12 = 4.0*sys->epsilon*c6*c6;
-    c6 *= 4.0*sys->epsilon;
-    rcsq = sys->rcut*sys->rcut;
     for(i = 0; i < (sys->natoms) - 1; i+=sys->nthreads) {
       int ii=i+tid;
       if (ii>=(sys->natoms-1)) break; 
