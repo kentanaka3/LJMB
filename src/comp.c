@@ -31,6 +31,11 @@ void force(mdsys_t *sys) {
   MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
   MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
   #endif
+  double c6 = 1.0, c12, rcsq;
+  for (i = 0; i < 6; i++) c6 *= sys->sigma;
+  c12 = 4.0*sys->epsilon*c6*c6;
+  c6 *= 4.0*sys->epsilon;
+  rcsq = sys->rcut*sys->rcut;
   #ifdef _OPENMP
   #pragma omp parallel reduction(+:epot)
   tid=omp_get_thread_num(); //thread number as thread "rank"
@@ -38,14 +43,9 @@ void force(mdsys_t *sys) {
   {
     double rx1,ry1,rz1;
     int fromidx,toidx;
-    double c6 = 1.0, c12, rcsq;
     azzero(sys->cx+tid*sys->natoms, sys->natoms);
     azzero(sys->cy+tid*sys->natoms, sys->natoms);
     azzero(sys->cz+tid*sys->natoms, sys->natoms);
-    for (i = 0; i < 6; i++) c6 *= sys->sigma;
-    c12 = 4.0*sys->epsilon*c6*c6;
-    c6 *= 4.0*sys->epsilon;
-    rcsq = sys->rcut*sys->rcut;
     for (i = 0; i < (sys->natoms) - 1; i += sys->nsize+sys->nthreads) {
       ii = i + sys->mpirank+tid;
       if (ii >= (sys->natoms - 1)) break;
