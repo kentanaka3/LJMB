@@ -14,8 +14,8 @@ target_include_directories(MAIN.x PUBLIC inc)
 add_library(Timer inc/Timer.hpp)
 set_target_properties(Timer PROPERTIES LINKER_LANGUAGE CXX)
 
-add_library(mdlib src/comp_omp.c src/verlet.c src/output.c src/utils.c src/init.c src/structs.c src/cleanup.c)
-#add_library(mdlib src/comp.c src/verlet.c src/output.c src/utils.c src/init.c src/structs.c src/cleanup.c)
+
+add_library(mdlib src/comp.c src/verlet.c src/output.c src/utils.c src/init.c src/structs.c src/cleanup.c)
 target_include_directories(mdlib PUBLIC inc)
 target_link_libraries(mdlib Timer)
 
