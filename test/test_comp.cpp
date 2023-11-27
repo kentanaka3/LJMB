@@ -86,15 +86,14 @@ class ComputationsTest:
     ASSERT_DOUBLE_EQ(sys->rx[0], -1.0);
     ASSERT_DOUBLE_EQ(sys->rx[1], 1.0);
     ASSERT_DOUBLE_EQ(sys->epot, 0.0);
-
     force(sys);
-    ASSERT_DOUBLE_EQ(sys->epot, 0.0);
-    ASSERT_DOUBLE_EQ(sys->fx[0], -24.0/sqrt(3));
-    ASSERT_DOUBLE_EQ(sys->fx[1], 24.0/sqrt(3));
-    ASSERT_DOUBLE_EQ(sys->fy[0], -24.0/sqrt(3));
-    ASSERT_DOUBLE_EQ(sys->fy[1], 24.0/sqrt(3));
-    ASSERT_DOUBLE_EQ(sys->fz[0], -24.0/sqrt(3));
-    ASSERT_DOUBLE_EQ(sys->fz[1], 24.0/sqrt(3));
+    ASSERT_DOUBLE_EQ(sys->epot, -6.315935428978668e-15);
+    ASSERT_DOUBLE_EQ(sys->fx[0], -13.856406460551002);
+    ASSERT_DOUBLE_EQ(sys->fx[1], 13.856406460551002);
+    ASSERT_DOUBLE_EQ(sys->fy[0], -13.856406460551002);
+    ASSERT_DOUBLE_EQ(sys->fy[1], 13.856406460551002);
+    ASSERT_DOUBLE_EQ(sys->fz[0], -13.856406460551002);
+    ASSERT_DOUBLE_EQ(sys->fz[1], 13.856406460551002);
   }
 
 

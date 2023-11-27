@@ -2,12 +2,12 @@
 #include "comp.h"
 #include <math.h>
 #ifdef _OPENMP
- #include <omp.h>
+#include <omp.h>
 #endif
 
 /*velocity verlet part two*/
 void velverlet_prop(mdsys_t *sys){
-  /* second part: propagate velocities by another half step */
+  /* Propagate velocities by another half step */
   for (int i = 0; i < sys->natoms; ++i) {
     sys->vx[i] += 0.5*sys->dt / MVSQ2E * sys->fx[i] / sys->mass;
     sys->vy[i] += 0.5*sys->dt / MVSQ2E * sys->fy[i] / sys->mass;
@@ -15,9 +15,9 @@ void velverlet_prop(mdsys_t *sys){
   }
 }
 
-/* velocity verlet part one*/
+/* Velocity verlet part one */
 void velverlet(mdsys_t *sys) {
-  /* first part: propagate velocities by half and positions by full step */
+  /* Propagate velocities by half and positions by full step */
   for (int i = 0; i < sys->natoms; ++i) {
     sys->vx[i] += 0.5*sys->dt / MVSQ2E * sys->fx[i] / sys->mass;
     sys->vy[i] += 0.5*sys->dt / MVSQ2E * sys->fy[i] / sys->mass;
