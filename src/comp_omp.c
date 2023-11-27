@@ -24,8 +24,7 @@ void force(mdsys_t *sys) {
   double rx, ry, rz;
   int i, j;
   int tid=0;
-  sys->nthreads;
-  int epot=0;
+  double epot=0;
   #ifdef _OPENMP
   #pragma omp parallel reduction(+:epot)
   #endif
@@ -33,16 +32,10 @@ void force(mdsys_t *sys) {
     double *fx,*fy,*fz; //auxiliary pointers
     double rx1,ry1,rz1;
     int fromidx,toidx;
-    int tid= 0;
     #ifdef _OPENMP
-      
-      int tid=omp_get_thread_num(); //thread number as thread "rank"
-    #else
-      int tid=0; //to preserve serial behavior 
-      sys->nthreads = 1; //to preserve serial behavior
+    int tid=omp_get_thread_num(); //thread number as thread "rank"
     #endif
     /* zero energy and forces */
-    sys->epot = 0.0;
     fx=sys->fx+(tid*sys->natoms);
     fy=sys->fy+(tid*sys->natoms);
     fz=sys->fz+(tid*sys->natoms);
@@ -74,31 +67,32 @@ void force(mdsys_t *sys) {
           ffac = -4.0*sys->epsilon*(-12.0*pow(sys->sigma/r, 12.0)/r
                                     + 6*pow(sys->sigma/r, 6.0)/r);
 
-          sys->epot += 0.5*4.0*sys->epsilon*(pow(sys->sigma/r, 12.0)
+          epot += 0.5*4.0*sys->epsilon*(pow(sys->sigma/r, 12.0)
                                             - pow(sys->sigma/r, 6.0));
 
-          #ifdef _OPENMP
-          #pragma omp barrier
-          #endif
-          i=1+(sys->natoms/sys->nthreads);
-          fromidx=tid*i;
-          toidx=fromidx+i;
-          if (toidx>sys->natoms) toidx = sys->natoms;
-
-        for (i=1;i<sys->nthreads;++i) {
-          int offs = i*sys->natoms;
-          for (int j=fromidx;j<toidx;++j){
-            sys->fx[j]+=sys->fx[offs+j];
-            sys->fx[j]+=sys->fy[offs+j];
-            sys->fz[j]+=sys->fz[offs+j];
-          }
-        }
-
-          sys->fx[i] += rx/r*ffac;
-          sys->fy[i] += ry/r*ffac;
-          sys->fz[i] += rz/r*ffac;
+          
         }
       }
     }
+    #ifdef _OPENMP
+    #pragma omp barrier
+    #endif
+    i=1+(sys->natoms/sys->nthreads);
+    fromidx=tid*i;
+    toidx=fromidx+i;
+    if (toidx>sys->natoms) toidx = sys->natoms;
+
+    for (i=1;i<sys->nthreads;++i) {
+      int offs = i*sys->natoms;
+      for (int j=fromidx;j<toidx;++j){
+        sys->fx[j]+=sys->fx[offs+j];
+        sys->fx[j]+=sys->fy[offs+j];
+        sys->fz[j]+=sys->fz[offs+j];
+      }
+    }
+
+    sys->fx[i] += rx/r*ffac;
+    sys->fy[i] += ry/r*ffac;
+    sys->fz[i] += rz/r*ffac;
   }
 }
