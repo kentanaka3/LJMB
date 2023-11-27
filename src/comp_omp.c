@@ -24,7 +24,7 @@ void force(mdsys_t *sys) {
   double rx, ry, rz;
   int i, j;
   #ifdef _OPENMP
-  #pragma omp parallel reduction(+:epot)
+  #pragma omp parallel reduction(+:sys->epot)
   #endif
   {
     double *fx,*fy,*fz; //auxiliary pointers
