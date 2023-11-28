@@ -47,7 +47,7 @@ void force(mdsys_t *sys) {
   azzero(fy, sys->natoms);
   azzero(fz, sys->natoms);
   double c6 = 1.0, c12, rcsq = sys->rcut*sys->rcut;
-  for (k = 0; k < 6; k++) c6 *= sys->sigma;
+  for (i = 0; i < 6; i++) c6 *= sys->sigma;
   c12 = 4.0*sys->epsilon*c6*c6;
   c6 *= 4.0*sys->epsilon;
   for (i = 0; i < (sys->natoms) - 1; i += sys->nsize * sys->nthreads) {
