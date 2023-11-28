@@ -20,38 +20,41 @@ void ekin(mdsys_t *sys) {
 
 /* compute forces */
 void force(mdsys_t *sys) {
-  double rsq, ffac;
-  double rx, ry, rz;
-  int i, j, ii, tid = 0;
+
+  int k, tid = 0;
   /* zero energy and forces */
   double epot = 0.0;
+  azzero(sys->cx, sys->natoms);
+  azzero(sys->cy, sys->natoms);
+  azzero(sys->cz, sys->natoms);
   #ifdef MY_MPI
   MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   #endif
   double c6 = 1.0, c12, rcsq = sys->rcut*sys->rcut;
-  for (i = 0; i < 6; i++) c6 *= sys->sigma;
+  for (k = 0; k < 6; k++) c6 *= sys->sigma;
   c12 = 4.0*sys->epsilon*c6*c6;
   c6 *= 4.0*sys->epsilon;
   #ifdef _OPENMP
   #pragma omp parallel reduction(+: epot)
   {
-  sys->nthreads=omp_get_num_threads();
+  //sys->nthreads=omp_get_num_threads();
+  sys->nthreads = omp_get_max_threads();
   tid = omp_get_thread_num(); //thread number as thread "rank"
   #endif
   double rx1, ry1, rz1;
+  double rsq, ffac;
+  double rx, ry, rz;
+  int i,j,ii;
   int fromidx, toidx;
-  azzero(sys->cx, sys->natoms);
-  azzero(sys->cy, sys->natoms);
-  azzero(sys->cz, sys->natoms);
+
   for (i = 0; i < (sys->natoms) - 1; i += sys->nsize*sys->nthreads) {
     ii = i + sys->mpirank*sys->nthreads + tid;
     if (ii >= (sys->natoms - 1)) break;
     rx1 = sys->rx[ii];
     ry1 = sys->ry[ii];
     rz1 = sys->rz[ii];
-    printf("%d\n",ii);
     for (j = ii + 1; j < (sys->natoms); ++j) {
       /* Get distance between particle i and j */
       rx = pbc(rx1 - sys->rx[j], 0.5*sys->box);

@@ -36,7 +36,7 @@ if(LJMD_OPENMP)
   FIND_PACKAGE(OpenMP REQUIRED)
   IF(OpenMP_FOUND)      
     target_link_libraries(mdlib OpenMP::OpenMP_C)
-    target_link_libraries(mdlib OpenMP::OpenMP_CXX)
+    #target_link_libraries(mdlib OpenMP::OpenMP_CXX)
    ENDIF() 
 endif()
 

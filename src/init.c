@@ -48,13 +48,13 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
   sys->vy = (double *)malloc(sys->natoms*sizeof(double));
   sys->vz = (double *)malloc(sys->natoms*sizeof(double));
 
-  sys->fx = (double *)malloc(sys->natoms*sizeof(double));
-  sys->fy = (double *)malloc(sys->natoms*sizeof(double));
-  sys->fz = (double *)malloc(sys->natoms*sizeof(double));
+  sys->fx = (double *)malloc(sys->natoms*sizeof(double)*sys->nthreads);
+  sys->fy = (double *)malloc(sys->natoms*sizeof(double)*sys->nthreads);
+  sys->fz = (double *)malloc(sys->natoms*sizeof(double)*sys->nthreads);
 
-  sys->cx = (double *)malloc(sys->natoms*sizeof(double));
-  sys->cy = (double *)malloc(sys->natoms*sizeof(double));
-  sys->cz = (double *)malloc(sys->natoms*sizeof(double));
+  sys->cx = (double *)malloc(sys->natoms*sizeof(double)*sys->nthreads);
+  sys->cy = (double *)malloc(sys->natoms*sizeof(double)*sys->nthreads);
+  sys->cz = (double *)malloc(sys->natoms*sizeof(double)*sys->nthreads);
 
   sys->mpirank = 0;
   sys->nsize = 1;
