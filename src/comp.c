@@ -74,7 +74,7 @@ void force(mdsys_t *sys) {
         }
       }
     }
-    sys->epot = epot;
+    
     #ifdef _OPENMP
     #pragma omp barrier
     #endif
@@ -91,5 +91,6 @@ void force(mdsys_t *sys) {
         sys->fz[j]+=sys->fz[offs+j];
       }
     }
-  }  
+  }
+  sys->epot = epot;  
 }
