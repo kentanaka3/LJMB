@@ -1,0 +1,14 @@
+78732             # natoms
+39.948            # mass in AMU
+-0.45             # m
+0.04395           # De
+2.0419            # a
+3.8979            # re
+12.0              # rcut in angstrom
+154.522           # box length (in angstrom)
+argon_78732.rest  # restart
+argon_78732.xyz   # trajectory
+argon_78732.dat   # energies
+20                # nr MD steps
+5.0               # MD time step (in fs)
+5                 # output print frequency
