@@ -23,12 +23,21 @@ void force(mdsys_t *sys) {
   int tid=0;
   double epot=0.0;
   double c6 = 1.0, c12, rcsq;
+
+  #ifdef _OPENMP
+  int nthreads = omp_get_max_threads();
+  sys->nthreads=nthreads;
+  #else
+  sys->nthreads=1;
+  #endif
+  printf("max threads: %d\n",sys->nthreads);
+
   for (i = 0; i < 6; i++) c6 *= sys->sigma;
   c12 = 4.0*sys->epsilon*c6*c6;
   c6 *= 4.0*sys->epsilon;
   rcsq = sys->rcut*sys->rcut;
   #ifdef _OPENMP
-  #pragma omp parallel private(i,j,ii,rx1,ry1,rz1,fx,fy,fz,fromidx,toidx) reduction(+:epot)
+  #pragma omp parallel
   #endif
   {
     double *fx,*fy,*fz; //auxiliary pointers
@@ -36,6 +45,8 @@ void force(mdsys_t *sys) {
     int fromidx,toidx;
     #ifdef _OPENMP
     tid=omp_get_thread_num(); //thread number as thread "rank"
+    printf("current number threads: %d\n",omp_get_num_threads());
+    printf("actual thread: %d\n",tid);
     #endif
     /* zero energy and forces */
     fx=sys->fx+(tid*sys->natoms);
@@ -44,7 +55,8 @@ void force(mdsys_t *sys) {
     azzero(fx, sys->natoms);
     azzero(fy, sys->natoms);
     azzero(fz, sys->natoms);
-
+    
+    
     for(i = 0; i < (sys->natoms) - 1; i+=sys->nthreads) {
       int ii=i+tid;
       if (ii>=(sys->natoms-1)) break; 
@@ -65,12 +77,12 @@ void force(mdsys_t *sys) {
           ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
           epot += (c12*rinv - c6)*rinv;
 
-          /*sys->fx[i] += rx*ffac;
-          sys->fy[i] += ry*ffac;
-          sys->fz[i] += rz*ffac;
-          sys->fx[j] -= rx*ffac;
-          sys->fy[j] -= ry*ffac;
-          sys->fz[j] -= rz*ffac;*/
+          //sys->fx[i] += rx*ffac;
+          //sys->fy[i] += ry*ffac;
+          //sys->fz[i] += rz*ffac;
+          //sys->fx[j] -= rx*ffac;
+          //sys->fy[j] -= ry*ffac;
+          //sys->fz[j] -= rz*ffac;
           fx[i] += rx*ffac;
           fy[i] += ry*ffac;
           fz[i] += rz*ffac;
@@ -91,9 +103,9 @@ void force(mdsys_t *sys) {
     for (i=1;i<sys->nthreads;++i) {
       int offs = i*sys->natoms;
       for (int j=fromidx;j<toidx;++j){
-        /*sys->fx[j]+=sys->fx[offs+j];
-        sys->fx[j]+=sys->fy[offs+j];
-        sys->fz[j]+=sys->fz[offs+j];*/
+        //sys->fx[j]+=sys->fx[offs+j];
+        //sys->fx[j]+=sys->fy[offs+j];
+        //sys->fz[j]+=sys->fz[offs+j];
         sys->fx[j]+=fx[offs+j];
         sys->fx[j]+=fy[offs+j];
         sys->fz[j]+=fz[offs+j];
