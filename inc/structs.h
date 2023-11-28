@@ -11,12 +11,13 @@
   extern const double MVSQ2E;
   /* structure to hold the complete information about the MD system */
   struct _mdsys {
-    int natoms,nfi,nsteps,nthreads;
+    int natoms, nfi, nsteps, nsize, mpirank, nthreads;
     double dt, mass, epsilon, sigma, box, rcut;
     double ekin, epot, temp;
     double *rx, *ry, *rz;
     double *vx, *vy, *vz;
     double *fx, *fy, *fz;
+    double *cx, *cy, *cz;
   };
   typedef struct _mdsys mdsys_t;
 #endif
