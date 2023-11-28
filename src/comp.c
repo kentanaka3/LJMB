@@ -74,11 +74,11 @@ void force(mdsys_t *sys) {
         }
       }
     }
-    /*
+    
     #ifdef _OPENMP
     #pragma omp barrier
     #endif
-    sys->epot += epot;
+    
     i = 1 + (sys->natoms/sys->nthreads);
     fromidx = tid*i;
     toidx = fromidx + i;
@@ -92,7 +92,6 @@ void force(mdsys_t *sys) {
         sys->fz[j] += sys->fz[offs + j];
       }
     }
-    */
   }
   #ifdef MY_MPI
   MPI_Reduce(sys->cx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
