@@ -22,37 +22,36 @@ void ekin(mdsys_t *sys) {
 void force(mdsys_t *sys) {
   double rsq, ffac;
   double rx, ry, rz;
-  int i, j, ii;
-  int tid=0;
+  int i, j, ii, tid = 0;
   /* zero energy and forces */
   double epot = 0.0;
   #ifdef MY_MPI
-  MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
-  MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
-  MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
+  MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   #endif
-  double c6 = 1.0, c12, rcsq;
+  double c6 = 1.0, c12, rcsq = sys->rcut*sys->rcut;
   for (i = 0; i < 6; i++) c6 *= sys->sigma;
   c12 = 4.0*sys->epsilon*c6*c6;
   c6 *= 4.0*sys->epsilon;
-  rcsq = sys->rcut*sys->rcut;
   #ifdef _OPENMP
-  #pragma omp parallel reduction(+:epot)
-  tid=omp_get_thread_num(); //thread number as thread "rank"
+  #pragma omp parallel reduction(+: epot)
+  tid = omp_get_thread_num(); //thread number as thread "rank"
+  sys->nthreads = omp_get_max_threads();
   #endif
   {
-    double rx1,ry1,rz1;
-    int fromidx,toidx;
-    azzero(sys->cx+tid*sys->natoms, sys->natoms);
-    azzero(sys->cy+tid*sys->natoms, sys->natoms);
-    azzero(sys->cz+tid*sys->natoms, sys->natoms);
-    for (i = 0; i < (sys->natoms) - 1; i += sys->nsize+sys->nthreads) {
-      ii = i + sys->mpirank+tid;
+    double rx1, ry1, rz1;
+    int fromidx, toidx;
+    azzero(sys->cx, sys->natoms);
+    azzero(sys->cy, sys->natoms);
+    azzero(sys->cz, sys->natoms);
+    for (i = 0; i < (sys->natoms) - 1; i += sys->nsize + sys->nthreads) {
+      ii = i + sys->mpirank + tid;
       if (ii >= (sys->natoms - 1)) break;
-      rx1=sys->rx[ii];
-      ry1=sys->ry[ii];
-      rz1=sys->rz[ii]; 
-      for (j = i + 1; j < (sys->natoms); ++j) {
+      rx1 = sys->rx[ii];
+      ry1 = sys->ry[ii];
+      rz1 = sys->rz[ii];
+      for (j = ii + 1; j < (sys->natoms); ++j) {
         /* Get distance between particle i and j */
         rx = pbc(rx1 - sys->rx[j], 0.5*sys->box);
         ry = pbc(rx1 - sys->ry[j], 0.5*sys->box);
@@ -65,40 +64,48 @@ void force(mdsys_t *sys) {
           ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
           epot += (c12*rinv - c6)*rinv;
 
-          sys->fx[i] += rx*ffac;
-          sys->fy[i] += ry*ffac;
-          sys->fz[i] += rz*ffac;
+          sys->cx[ii] += rx*ffac;
+          sys->cy[ii] += ry*ffac;
+          sys->cz[ii] += rz*ffac;
+
           sys->cx[j] -= rx*ffac;
           sys->cy[j] -= ry*ffac;
           sys->cz[j] -= rz*ffac;
         }
       }
     }
+    /*
     #ifdef _OPENMP
     #pragma omp barrier
     #endif
     sys->epot += epot;
-    i=1+(sys->natoms/sys->nthreads);
-    fromidx=tid*i;
-    toidx=fromidx+i;
-    if (toidx>sys->natoms) toidx = sys->natoms;
+    i = 1 + (sys->natoms/sys->nthreads);
+    fromidx = tid*i;
+    toidx = fromidx + i;
+    if (toidx > sys->natoms) toidx = sys->natoms;
 
-    for (i=1;i<sys->nthreads;++i) {
+    for (i = 1; i < sys->nthreads; ++i) {
       int offs = i*sys->natoms;
-      for (int j=fromidx;j<toidx;++j){
-        sys->fx[j]+=sys->fx[offs+j];
-        sys->fx[j]+=sys->fy[offs+j];
-        sys->fz[j]+=sys->fz[offs+j];
+      for (j = fromidx; j < toidx; ++j){
+        sys->fx[j] += sys->fx[offs + j];
+        sys->fx[j] += sys->fy[offs + j];
+        sys->fz[j] += sys->fz[offs + j];
       }
     }
+    */
   }
   #ifdef MY_MPI
   MPI_Reduce(sys->cx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-             sys->mpicomm);
+             MPI_COMM_WORLD);
   MPI_Reduce(sys->cy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-             sys->mpicomm);
+             MPI_COMM_WORLD);
   MPI_Reduce(sys->cz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-             sys->mpicomm);
-  MPI_Reduce(&epot, %sys->epot, 1, MPI_DOUBLE, MPI_SUM, 0, sys->mpicomm);
+             MPI_COMM_WORLD);
+  MPI_Reduce(&epot, %sys->epot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  #else
+  sys->fx = sys->cx;
+  sys->fy = sys->cy;
+  sys->fz = sys->cz;
+  sys->epot = epot;
   #endif
 }
