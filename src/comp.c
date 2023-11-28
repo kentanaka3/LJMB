@@ -74,7 +74,6 @@ void force(mdsys_t *sys) {
         }
       }
     }
-    
     #ifdef _OPENMP
     #pragma omp barrier
     #endif
