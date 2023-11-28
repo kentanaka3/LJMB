@@ -40,5 +40,4 @@ int get_a_line(FILE *fp, char *buf) {
     perror("problem reading input");
     return -1;
   }
-  return 0;
 }
