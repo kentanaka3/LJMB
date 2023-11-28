@@ -28,7 +28,7 @@ void force(mdsys_t *sys) {
   c6 *= 4.0*sys->epsilon;
   rcsq = sys->rcut*sys->rcut;
   #ifdef _OPENMP
-  #pragma omp parallel reduction(+:epot)
+  #pragma omp parallel private(i,j,ii,rx1,ry1,rz1,fx,fy,fz,fromidx,toidx) reduction(+:epot)
   #endif
   {
     double *fx,*fy,*fz; //auxiliary pointers
@@ -65,12 +65,18 @@ void force(mdsys_t *sys) {
           ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
           epot += (c12*rinv - c6)*rinv;
 
-          sys->fx[i] += rx*ffac;
+          /*sys->fx[i] += rx*ffac;
           sys->fy[i] += ry*ffac;
           sys->fz[i] += rz*ffac;
           sys->fx[j] -= rx*ffac;
           sys->fy[j] -= ry*ffac;
-          sys->fz[j] -= rz*ffac;
+          sys->fz[j] -= rz*ffac;*/
+          fx[i] += rx*ffac;
+          fy[i] += ry*ffac;
+          fz[i] += rz*ffac;
+          fx[j] -= rx*ffac;
+          fy[j] -= ry*ffac;
+          fz[j] -= rz*ffac;
         }
       }
     }
@@ -85,9 +91,12 @@ void force(mdsys_t *sys) {
     for (i=1;i<sys->nthreads;++i) {
       int offs = i*sys->natoms;
       for (int j=fromidx;j<toidx;++j){
-        sys->fx[j]+=sys->fx[offs+j];
+        /*sys->fx[j]+=sys->fx[offs+j];
         sys->fx[j]+=sys->fy[offs+j];
-        sys->fz[j]+=sys->fz[offs+j];
+        sys->fz[j]+=sys->fz[offs+j];*/
+        sys->fx[j]+=fx[offs+j];
+        sys->fx[j]+=fy[offs+j];
+        sys->fz[j]+=fz[offs+j];
       }
     }
   }
