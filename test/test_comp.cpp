@@ -5,9 +5,10 @@
 #include "utils.h"
 #include <ctype.h>
 #include <stdlib.h>
-#include <math.h>
 
-
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 class ComputationsTest:
   public::testing::Test {
@@ -24,24 +25,28 @@ class ComputationsTest:
       sys->epsilon = 0.2379;
       sys->sigma = 3.405;
       sys->epot = -160.48438434;
+      #ifdef _OPENMP
+      sys->nthreads = omp_get_max_threads();
+      #else
       sys->nthreads = 1;
+      #endif
       sys->mpirank = 0;
       sys->nsize = 1;
       sys->dt = MVSQ2E;
       sys->rx = new double[sys->natoms];
       sys->vx = new double[sys->natoms];
       sys->fx = new double[sys->natoms];
-      sys->cx = new double[sys->natoms];
+      sys->cx = new double[sys->natoms*sys->nthreads];
 
       sys->ry = new double[sys->natoms];
       sys->vy = new double[sys->natoms];
       sys->fy = new double[sys->natoms];
-      sys->cy = new double[sys->natoms];
+      sys->cy = new double[sys->natoms*sys->nthreads];
 
       sys->rz = new double[sys->natoms];
       sys->vz = new double[sys->natoms];
       sys->fz = new double[sys->natoms];
-      sys->cz = new double[sys->natoms];
+      sys->cz = new double[sys->natoms*sys->nthreads];
 
       sys->rx[0] = -1.0;
       sys->rx[1] = 1.0;
@@ -74,7 +79,7 @@ class ComputationsTest:
       sys->cx[1] = 0.2;
 
       sys->cy[0] = 1.0;
-      sys->cy[1] = 0.2;
+      sys->cx[1] = 0.2;
 
       sys->cz[0] = 1.0;
       sys->cz[1] = 0.2;
@@ -83,12 +88,17 @@ class ComputationsTest:
       delete[] sys->rx;
       delete[] sys->vx;
       delete[] sys->fx;
+      delete[] sys->cx;
+
       delete[] sys->ry;
       delete[] sys->vy;
       delete[] sys->fy;
+      delete[] sys->cy;
+
       delete[] sys->rz;
       delete[] sys->vz;
       delete[] sys->fz;
+      delete[] sys->cz;
 
       delete sys;
     }
