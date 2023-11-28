@@ -47,7 +47,6 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
   sys->vx = (double *)malloc(sys->natoms*sizeof(double));
   sys->vy = (double *)malloc(sys->natoms*sizeof(double));
   sys->vz = (double *)malloc(sys->natoms*sizeof(double));
-
   sys->fx = (double *)malloc(sys->natoms*sizeof(double));
   sys->fy = (double *)malloc(sys->natoms*sizeof(double));
   sys->fz = (double *)malloc(sys->natoms*sizeof(double));
