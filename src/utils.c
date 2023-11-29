@@ -3,7 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <math.h>
 
 /* helper function: zero out an array */
 void azzero(double *d, const int n) {
