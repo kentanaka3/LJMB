@@ -3,7 +3,7 @@
 #ifdef MY_MPI
 #include "myMPI.hpp"
 #endif
-#ifdef _OPENMP
+#if defined (_OPENMP)
 #include <omp.h>
 #endif
 
@@ -20,24 +20,22 @@ void ekin(mdsys_t *sys) {
 
 /* compute forces */
 void force(mdsys_t *sys) {
-  double rsq, ffac;
-  int i, j, ii, tid = 0;
+  double epot = 0.0;
   /* zero energy and forces */
   #ifdef MY_MPI
   MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   #endif
-  double epot = 0.0;
-  #ifdef _OPENMP
-  //sys->nthreads = omp_get_num_threads();
-  sys->nthreads = omp_get_max_threads();
+  #if defined (_OPENMP)
   #pragma omp parallel reduction(+:epot)
+  #endif
   {
-  tid = omp_get_thread_num(); //thread number as thread "rank"
+  #if defined (_OPENMP)
+  int tid = omp_get_thread_num(); //thread number as thread "rank"
   #else
   sys->nthreads = 1;
-  tid = 0;
+  int tid = 0;
   #endif
   double *fx, *fy, *fz;
   fx = sys->cx + (tid*sys->natoms);
@@ -46,52 +44,52 @@ void force(mdsys_t *sys) {
   azzero(fx, sys->natoms);
   azzero(fy, sys->natoms);
   azzero(fz, sys->natoms);
-  double c6 = 1.0, c12, rcsq = sys->rcut*sys->rcut;
-  for (i = 0; i < 6; i++) c6 *= sys->sigma;
+  double c6, c12, rcsq = sys->rcut*sys->rcut;
+  c6 = sys->sigma*sys->sigma*sys->sigma*sys->sigma*sys->sigma*sys->sigma;
   c12 = 4.0*sys->epsilon*c6*c6;
   c6 *= 4.0*sys->epsilon;
-  for (i = 0; i < (sys->natoms) - 1; i += sys->nsize * sys->nthreads) {
-    ii = i + sys->mpirank * sys->nthreads + tid;
+  for (int i = 0; i < (sys->natoms) - 1; i += sys->nsize * sys->nthreads) {
+    int ii = i + sys->mpirank * sys->nthreads + tid;
     if (ii >= (sys->natoms - 1)) break;
-    double rx1 = sys->rx[ii], ry1 = sys->ry[ii], rz1 = sys->rz[ii];
-    for (j = ii + 1; j < (sys->natoms); ++j) {
-      /* Get distance between particle i and j */
-      double rx, ry, rz;
-      rx = pbc(rx1 - sys->rx[j], 0.5*sys->box);
-      ry = pbc(ry1 - sys->ry[j], 0.5*sys->box);
-      rz = pbc(rz1 - sys->rz[j], 0.5*sys->box);
-      rsq = rx*rx + ry*ry + rz*rz;
+    double rx1 = sys->rx[ii];
+    double ry1 = sys->ry[ii];
+    double rz1 = sys->rz[ii];
+    for (int jj = ii + 1; jj < (sys->natoms); ++jj) {
+      /* Get distance between particle i and jj */
+      double rx = pbc(rx1 - sys->rx[jj], 0.5*sys->box);
+      double ry = pbc(ry1 - sys->ry[jj], 0.5*sys->box);
+      double rz = pbc(rz1 - sys->rz[jj], 0.5*sys->box);
+      double rsq = rx*rx + ry*ry + rz*rz;
       /* Compute Force and Energy if within cutoff */
       if (rsq < rcsq) {
         double rinv = ((1.0 / rsq) / rsq) / rsq;
-        ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
+        double ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
         epot += (c12*rinv - c6)*rinv;
 
         fx[ii] += rx*ffac;
         fy[ii] += ry*ffac;
         fz[ii] += rz*ffac;
 
-        fx[j] -= rx*ffac;
-        fy[j] -= ry*ffac;
-        fz[j] -= rz*ffac;
+        fx[jj] -= rx*ffac;
+        fy[jj] -= ry*ffac;
+        fz[jj] -= rz*ffac;
       }
     }
   }
-  #ifdef _OPENMP
+  #if defined (_OPENMP)
   #pragma omp barrier
   #endif
-  i = (sys->natoms/sys->nthreads) + 1;
-  int fromidx = tid * i, toidx = fromidx + i;
+  int i = (sys->natoms/sys->nthreads) + 1;
+  int fromidx = tid * i;
+  int toidx = fromidx + i;
   if (toidx > sys->natoms) toidx = sys->natoms;
-  for (i = 1; i < sys->nthreads; ++i) {
+  for (int i = 1; i < sys->nthreads; ++i) {
     int offs = i*sys->natoms;
-    for (j = fromidx; j < toidx; ++j) sys->cx[j] += sys->cx[offs + j];
-    for (j = fromidx; j < toidx; ++j) sys->cy[j] += sys->cy[offs + j];
-    for (j = fromidx; j < toidx; ++j) sys->cz[j] += sys->cz[offs + j];
+    for (int j = fromidx; j < toidx; ++j) sys->cx[j] += sys->cx[offs + j];
+    for (int j = fromidx; j < toidx; ++j) sys->cy[j] += sys->cy[offs + j];
+    for (int j = fromidx; j < toidx; ++j) sys->cz[j] += sys->cz[offs + j];
   }
-  #ifdef _OPENMP
   }
-  #endif
   #ifdef MY_MPI
   MPI_Reduce(sys->cx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
@@ -101,9 +99,9 @@ void force(mdsys_t *sys) {
              MPI_COMM_WORLD);
   MPI_Reduce(&epot, %sys->epot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   #else
-  for (i = 0; i < sys->natoms; i++) sys->fx[i] = sys->cx[i];
-  for (i = 0; i < sys->natoms; i++) sys->fy[i] = sys->cy[i];
-  for (i = 0; i < sys->natoms; i++) sys->fz[i] = sys->cz[i];
+  for (int i = 0; i < sys->natoms; i++) sys->fx[i] = sys->cx[i];
+  for (int i = 0; i < sys->natoms; i++) sys->fy[i] = sys->cy[i];
+  for (int i = 0; i < sys->natoms; i++) sys->fz[i] = sys->cz[i];
   sys->epot = epot;
   #endif
 }
