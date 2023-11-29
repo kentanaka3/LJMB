@@ -38,11 +38,14 @@ int main(int argc, char *argv[]) {
   #ifdef MY_MPI
   if (!sys.mpirank)
   #endif
-  printf("Starting simulation with %d atoms for %d steps.\n" \
-         "\tNFI\t\tTEMP\t\tEKIN\t\t\tEPOT\t\t\tETOT\n", sys.natoms, sys.nsteps);
+  printf("Starting simulation with %d atoms for %d steps.\n\t" \
+         "NFI\t\tTEMP\t\tEKIN\t\t\tEPOT\t\t\tETOT\n", sys.natoms, sys.nsteps);
 
   erg = fopen(ergfile, "w");
   traj = fopen(trajfile, "w");
+  #ifdef MY_MPI
+  if (!sys.mpirank)
+  #endif
   output(&sys, erg, traj);
 
   {CSimpleTimer t{"RunTime"};
@@ -72,6 +75,9 @@ int main(int argc, char *argv[]) {
   }
   }
   cleanup(erg, traj, sys);
+  #ifdef MY_MPI
+  if (!myPE)
+  #endif
   print_timing_results();
   #ifdef MY_MPI
   MPI_Finalize();
