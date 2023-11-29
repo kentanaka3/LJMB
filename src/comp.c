@@ -103,7 +103,7 @@ void force(mdsys_t *sys) {
              MPI_COMM_WORLD);
   MPI_Reduce(sys->cz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
-  MPI_Reduce(&epot, &sys->epot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&epot, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   #else
   for (int i = 0; i < sys->natoms; i++) sys->fx[i] = sys->cx[i];
   for (int i = 0; i < sys->natoms; i++) sys->fy[i] = sys->cy[i];
