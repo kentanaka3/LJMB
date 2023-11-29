@@ -1,6 +1,6 @@
 #include "structs.h"
 #include "utils.h"
-#ifdef MY_MPI
+#ifdef _MPI
 #include "myMPI.hpp"
 #endif
 #if defined (_OPENMP)
@@ -22,7 +22,7 @@ void ekin(mdsys_t *sys) {
 void force(mdsys_t *sys) {
   double epot = 0.0;
   /* zero energy and forces */
-  #ifdef MY_MPI
+  #ifdef _MPI
   MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -90,7 +90,7 @@ void force(mdsys_t *sys) {
     for (int j = fromidx; j < toidx; ++j) sys->cz[j] += sys->cz[offs + j];
   }
   }
-  #ifdef MY_MPI
+  #ifdef _MPI
   MPI_Reduce(sys->cx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
   MPI_Reduce(sys->cy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,

@@ -15,7 +15,7 @@ struct TimerData{
 
 std::map<std::string, TimerData> timeTable;
 void print_timing_results() {
-  #ifdef MY_MPI
+  #ifdef _MPI
   std::cout << std::endl << "- TIMING RESULTS -" << std::endl;
   extern int myPE, nPEs;
   auto sample = timeTable.begin() -> second.t.count();
