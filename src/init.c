@@ -1,7 +1,7 @@
 #include "structs.h"
 #include "utils.h"
 #include <stdlib.h>
-#ifdef MY_MPI
+#ifdef _MPI
 #include "myMPI.hpp"
 #endif
 #ifdef _OPENMP
