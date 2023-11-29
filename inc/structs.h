@@ -18,6 +18,7 @@
     double *vx, *vy, *vz;
     double *fx, *fy, *fz;
     double *cx, *cy, *cz;
+    double m, De, a, re;
   };
   typedef struct _mdsys mdsys_t;
 #endif

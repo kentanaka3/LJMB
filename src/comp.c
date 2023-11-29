@@ -1,7 +1,7 @@
 #include "structs.h"
 #include "utils.h"
-#ifdef _MPI
-#include "myMPI.hpp"
+#ifdef MY_MPI
+#include <mpi.h>
 #endif
 #if defined (_OPENMP)
 #include <omp.h>
@@ -22,7 +22,7 @@ void ekin(mdsys_t *sys) {
 void force(mdsys_t *sys) {
   double epot = 0.0;
   /* zero energy and forces */
-  #ifdef _MPI
+  #ifdef MY_MPI
   MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -62,6 +62,12 @@ void force(mdsys_t *sys) {
       double rsq = rx*rx + ry*ry + rz*rz;
       /* Compute Force and Energy if within cutoff */
       if (rsq < rcsq) {
+        /* Morse Potential
+        MM = exp(- sys->a * (r - sys->re));
+        // Mores potential
+        sys->epot += sys->m + sys->De * (1-MM)*(1-MM);
+        ffac = 2 * sys->a * sys->De * MM * (1-MM);
+         */
         double rinv = ((1.0 / rsq) / rsq) / rsq;
         double ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
         epot += (c12*rinv - c6)*rinv;
@@ -90,14 +96,14 @@ void force(mdsys_t *sys) {
     for (int j = fromidx; j < toidx; ++j) sys->cz[j] += sys->cz[offs + j];
   }
   }
-  #ifdef _MPI
+  #ifdef MY_MPI
   MPI_Reduce(sys->cx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
   MPI_Reduce(sys->cy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
   MPI_Reduce(sys->cz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
              MPI_COMM_WORLD);
-  MPI_Reduce(&epot, %sys->epot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  MPI_Reduce(&epot, &sys->epot, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
   #else
   for (int i = 0; i < sys->natoms; i++) sys->fx[i] = sys->cx[i];
   for (int i = 0; i < sys->natoms; i++) sys->fy[i] = sys->cy[i];

@@ -1,21 +1,29 @@
 #include "structs.h"
 #include "utils.h"
 #include <stdlib.h>
-#ifdef _MPI
-#include "myMPI.hpp"
+#ifdef MY_MPI
+#include <mpi.h>
+extern int myPE, nPEs;
 #endif
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
-  char restfile[BLEN], line[BLEN];
-  FILE *fp;
+void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint) {
   /*initialize n threads*/
   sys->nthreads = 1;
   #ifdef _OPENMP
   sys->nthreads = omp_get_max_threads();
   #endif
+  sys->mpirank = 0;
+  sys->nsize = 1;
+  #ifdef MY_MPI
+  sys->mpirank = myPE;
+  sys->nsize = nPEs;
+  if (!sys->mpirank) {
+  #endif
+  char restfile[BLEN], line[BLEN];
+  FILE *fp;
   /* read input file */
   if (get_a_line(stdin, line)) exit(1);
   sys->natoms = atoi(line);
@@ -56,14 +64,6 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
   sys->cy = (double *)malloc(sys->natoms*sys->nthreads*sizeof(double));
   sys->cz = (double *)malloc(sys->natoms*sys->nthreads*sizeof(double));
 
-  sys->mpirank = 0;
-  sys->nsize = 1;
-  #ifdef MY_MPI
-  sys->mpirank = myPE;
-  sys->nsize = nPEs;
-  #endif
-
-
   /* read restart */
   fp = fopen(restfile, "r");
   if (fp) {
@@ -82,4 +82,59 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint){
     perror("cannot read restart file");
     exit(3);
   }
+  #ifdef MY_MPI
+  }
+  MPI_Bcast(&sys->natoms, 1, MPI_INTEGER, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(&sys->mass, 1, MPI_INTEGER, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(&sys->epsilon, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(&sys->sigma, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(&sys->rcut, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(&sys->box, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(&sys->nsteps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(&sys->dt, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(nprint, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  if (sys->mpirank) {
+    printf("PE = %i, Atoms = %i, Threads = %i, nprint = %i\n",
+           myPE, sys->natoms, sys->nthreads, *nprint);
+    sys->rx = (double *)malloc(sys->natoms*sizeof(double));
+    sys->ry = (double *)malloc(sys->natoms*sizeof(double));
+    sys->rz = (double *)malloc(sys->natoms*sizeof(double));
+
+    sys->vx = (double *)malloc(sys->natoms*sizeof(double));
+    sys->vy = (double *)malloc(sys->natoms*sizeof(double));
+    sys->vz = (double *)malloc(sys->natoms*sizeof(double));
+
+    sys->fx = (double *)malloc(sys->natoms*sizeof(double));
+    sys->fy = (double *)malloc(sys->natoms*sizeof(double));
+    sys->fz = (double *)malloc(sys->natoms*sizeof(double));
+
+    sys->cx = (double *)malloc(sys->natoms*sys->nthreads*sizeof(double));
+    sys->cy = (double *)malloc(sys->natoms*sys->nthreads*sizeof(double));
+    sys->cz = (double *)malloc(sys->natoms*sys->nthreads*sizeof(double));
+  }
+  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(sys->vx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->vy, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->vz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(sys->fx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->fy, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->fz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(sys->cx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->cy, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->cz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  #endif
 }

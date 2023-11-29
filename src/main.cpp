@@ -11,12 +11,12 @@
 #include "verlet.h"
 #include "structs.h"
 #include "cleanup.h"
-#ifdef _MPI
-  #include "myMPI.hpp"
+#ifdef MY_MPI
+#include "myMPI.hpp"
 #endif
 
 int main(int argc, char *argv[]) {
-  #ifdef _MPI
+  #ifdef MY_MPI
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &myPE);
   MPI_Comm_size(MPI_COMM_WORLD, &nPEs);
@@ -26,20 +26,17 @@ int main(int argc, char *argv[]) {
   char trajfile[BLEN], ergfile[BLEN];
   FILE *traj, *erg;
   mdsys_t sys;
-  #ifdef _MPI
-  if (!myPE)
-  printf("LJMD version %3.1f\n", LJMD_VERSION);
-  #endif
   {CSimpleTimer t{"Startup Time"};
   initialize(&sys, trajfile, ergfile, &nprint);
+  if (!sys.mpirank) printf("LJMD version %3.1f\n", LJMD_VERSION);
 
   /* Initialize Forces and Energies.*/
   sys.nfi = 0;
   force(&sys);
   ekin(&sys);
   }
-  #ifdef _MPI
-  if (!myPE)
+  #ifdef MY_MPI
+  if (!sys.mpirank)
   #endif
   printf("Starting simulation with %d atoms for %d steps.\n" \
          "\tNFI\t\tTEMP\t\tEKIN\t\t\tEPOT\t\t\tETOT\n", sys.natoms, sys.nsteps);
@@ -53,7 +50,7 @@ int main(int argc, char *argv[]) {
   for (sys.nfi = 1; sys.nfi <= sys.nsteps; ++sys.nfi) {
     /* write output, if requested */
     if ((sys.nfi % nprint) == 0)
-      #ifdef _MPI
+      #ifdef MY_MPI
       if (!myPE)
       #endif
       output(&sys, erg, traj);
@@ -76,7 +73,7 @@ int main(int argc, char *argv[]) {
   }
   cleanup(erg, traj, sys);
   print_timing_results();
-  #ifdef _MPI
+  #ifdef MY_MPI
   MPI_Finalize();
   #endif
   return 0;
