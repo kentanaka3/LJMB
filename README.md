@@ -30,6 +30,7 @@ The implemented test framework for the separated functions is GoogleTest. The sr
 - test_verlet -> testing velverlet, velverlet_prop functions
 
 ## Comparison
+# Serial
 ![Run Time](img/RunTime.png)
 ![Force](img/Force.png)
 ![Velverlet](img/Velverlet.png)
