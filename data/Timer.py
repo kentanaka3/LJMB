@@ -5,7 +5,7 @@ atom = re.compile( r"^Starting simulation with (?P<atoms>\d+)")
 z = 0
 m = re.compile(r"^(?P<name>\w+):\s(?P<calls>\d+)")
 n = re.compile(r"(\d+) *")
-o = re.compile(r"\d+_(?P<node>\d+)_(?P<thread>\d+).out")
+o = re.compile(r"\d+_(?P<node>\d+)_(?P<tasks>\d+)_(?P<thread>\d+).out")
 x = 0
 y = 0
 for arg in range(1, len(sys.argv)):
@@ -16,7 +16,9 @@ for arg in range(1, len(sys.argv)):
       key = ""
       files = o.match(i)
       if files:
-        key = "_" + files.group("node") + "_" + files.group("thread")
+        key = "_" + files.group("node") + \
+              "_" + files.group("tasks") + \
+              "_" + files.group("thread")
         M.setdefault(key, dict())
       Timing = {}
       z = 0
@@ -44,14 +46,13 @@ for arg in range(1, len(sys.argv)):
   if len(M.keys()) > 1:
     x = []
     y = []
+    z = []
     for a in M.keys():
       files = o.match(a)
       if files:
-        x.append(files.group("node"))
-        y.append(files.group("thread"))
-    if len(y) > 1:
-      x, y = y, x
-    
+        x.append(int(files.group("node")))
+        y.append(int(files.group("tasks")))
+        z.append(int(files.group("thread")))
     titles = [title for title in M[a][x[0]]]
     for t in titles:
       with open(os.path.join(pathname, t + a + "_tk.dat"), 'w') as fr:
