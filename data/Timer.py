@@ -10,7 +10,7 @@ y = 0
 M = {}
 pathname = os.path.join("Timer", sys.argv[1])
 for i in sorted(os.listdir(pathname), reverse=False):
-  if i.startswith("out"):
+  if i.endwithwith(".out"):
     Timing = {}
     with open(os.path.join(pathname, i), 'r') as fr:
       L = fr.readline()
