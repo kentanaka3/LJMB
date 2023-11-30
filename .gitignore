@@ -22,4 +22,3 @@ data/*.xyz
 !data/refs/argon_78732.dat
 *.err
 !data/Timer/*/*.dat
-!data/Timer/*/*.out
