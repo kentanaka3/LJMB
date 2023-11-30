@@ -37,3 +37,10 @@ The implemented test framework for the separated functions is GoogleTest. The sr
 ![Propagate](img/Propagate.png)
 ![KineticEnergy](img/KineticEnergy.png)
 ![Start Up](img/StartupTime.png)
+# Optimized
+
+# MPI
+
+# OpenMP
+
+# MPI+OpenMP
