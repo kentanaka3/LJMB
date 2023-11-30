@@ -55,7 +55,6 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint) {
   sys->a = atof(line);
   if (get_a_line(stdin, line)) exit(1);
   sys->re = atof(line);
-  
 
   /* allocate memory */
   sys->rx = (double *)malloc(sys->natoms*sizeof(double));

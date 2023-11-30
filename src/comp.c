@@ -6,9 +6,8 @@
 #if defined (_OPENMP)
 #include <omp.h>
 #endif
-
 #ifdef MORSE
-
+#include <math.c>
 #endif
 
 /* Compute Kinetic Energy */
@@ -38,7 +37,6 @@ void force(mdsys_t *sys) {
   #if defined (_OPENMP)
   int tid = omp_get_thread_num(); //thread number as thread "rank"
   #else
-  sys->nthreads = 1;
   int tid = 0;
   #endif
   double *fx, *fy, *fz;
@@ -66,15 +64,18 @@ void force(mdsys_t *sys) {
       double rsq = rx*rx + ry*ry + rz*rz;
       /* Compute Force and Energy if within cutoff */
       if (rsq < rcsq) {
-        /* Morse Potential
-        MM = exp(- sys->a * (r - sys->re));
-        // Mores potential
-        sys->epot += sys->m + sys->De * (1-MM)*(1-MM);
-        ffac = 2 * sys->a * sys->De * MM * (1-MM);
-         */
+        #ifdef MORSE
+        // Morse Potential
+        MM = exp(-sys->a * (r - sys->re));
+        // Morse potential
+        epot += sys->m + sys->De * (1 - MM)*(1 - MM);
+        double ffac = 2 * sys->a * sys->De * MM * (1 - MM);
+        #else
+        // LJ Potential
         double rinv = ((1.0 / rsq) / rsq) / rsq;
         double ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
         epot += (c12*rinv - c6)*rinv;
+        #endif
 
         fx[ii] += rx*ffac;
         fy[ii] += ry*ffac;
