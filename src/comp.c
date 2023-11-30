@@ -7,6 +7,10 @@
 #include <omp.h>
 #endif
 
+#ifdef MORSE
+
+#endif
+
 /* Compute Kinetic Energy */
 void ekin(mdsys_t *sys) {
   sys->ekin = 0.0;

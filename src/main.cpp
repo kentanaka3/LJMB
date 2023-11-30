@@ -35,17 +35,12 @@ int main(int argc, char *argv[]) {
   force(&sys);
   ekin(&sys);
   }
-  #ifdef MY_MPI
   if (!sys.mpirank)
-  #endif
   printf("Starting simulation with %d atoms for %d steps.\n\t" \
          "NFI\t\tTEMP\t\tEKIN\t\t\tEPOT\t\t\tETOT\n", sys.natoms, sys.nsteps);
 
   erg = fopen(ergfile, "w");
   traj = fopen(trajfile, "w");
-  #ifdef MY_MPI
-  if (!sys.mpirank)
-  #endif
   output(&sys, erg, traj);
 
   {CSimpleTimer t{"RunTime"};
@@ -53,9 +48,6 @@ int main(int argc, char *argv[]) {
   for (sys.nfi = 1; sys.nfi <= sys.nsteps; ++sys.nfi) {
     /* write output, if requested */
     if ((sys.nfi % nprint) == 0)
-      #ifdef MY_MPI
-      if (!myPE)
-      #endif
       output(&sys, erg, traj);
     /* propagate system and recompute energies */
     {CSimpleTimer t{"Velverlet"};
@@ -75,9 +67,6 @@ int main(int argc, char *argv[]) {
   }
   }
   cleanup(erg, traj, sys);
-  #ifdef MY_MPI
-  if (!myPE)
-  #endif
   print_timing_results();
   #ifdef MY_MPI
   MPI_Finalize();

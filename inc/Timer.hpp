@@ -4,6 +4,10 @@
 #include <vector>
 #include <map>
 
+#ifdef MY_MPI
+#include <mpi.h>
+#endif
+
 using time_units = std::chrono::milliseconds;
 
 struct TimerData{
@@ -15,7 +19,7 @@ struct TimerData{
 
 std::map<std::string, TimerData> timeTable;
 void print_timing_results() {
-  #ifdef _MPI
+  #ifdef MY_MPI
   std::cout << std::endl << "- TIMING RESULTS -" << std::endl;
   extern int myPE, nPEs;
   auto sample = timeTable.begin() -> second.t.count();
