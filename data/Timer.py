@@ -12,7 +12,7 @@ M = {}
 for arg in range(1, len(sys.argv)):
   pathname = os.path.join("Timer", arg)
   for i in sorted(os.listdir(pathname), reverse=False):
-    if i.endswith("out"):
+    if i.endswith(".out"):
       node = 0
       thread = 0
       files = o.match(i)

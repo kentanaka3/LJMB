@@ -3,8 +3,8 @@ if [[ ( "$1" == "Leonardo" ) || ( "$1" == "Ulysses" ) ]]; then
   echo "Analyzing for $1"
   #for j in 4 6 8 12 16 24 32; do
   #  for i in 8 16 32; do
-  for j in 1; do
-    for i in 32; do
+  for j in 1 2 4 8 16 32; do
+    for i in 1 2 4 8 16 32; do
       sed -i -E -e "s/(#SBATCH --job-name=\"LJMB) # #/\1 ${j} ${i}/g" \
                 -e "s/(#SBATCH --nodes=)#/\1${j}/g" \
                 -e "s/(#SBATCH --tasks-per-node=)#/\1$((32/${i}))/g" \
