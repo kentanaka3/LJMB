@@ -35,12 +35,13 @@ int main(int argc, char *argv[]) {
   force(&sys);
   ekin(&sys);
   }
-  if (!sys.mpirank)
-  printf("Starting simulation with %d atoms for %d steps.\n\t" \
-         "NFI\t\tTEMP\t\tEKIN\t\t\tEPOT\t\t\tETOT\n", sys.natoms, sys.nsteps);
-
+  if (!sys.mpirank) {
+  printf("Starting simulation with %d atoms for %d steps, nPEs = %d, " \
+         "Thds = %d.\n\tNFI\t\tTEMP\t\tEKIN\t\t\tEPOT\t\t\tETOT\n", sys.natoms,
+         sys.nsteps, sys.nsize, sys.nthreads);
   erg = fopen(ergfile, "w");
   traj = fopen(trajfile, "w");
+  }
   output(&sys, erg, traj);
 
   {CSimpleTimer t{"RunTime"};

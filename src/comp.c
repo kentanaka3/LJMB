@@ -37,7 +37,6 @@ void force(mdsys_t *sys) {
   #if defined (_OPENMP)
   int tid = omp_get_thread_num(); //thread number as thread "rank"
   #else
-  sys->nthreads = 1;
   int tid = 0;
   #endif
   double *fx, *fy, *fz;
