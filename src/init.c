@@ -47,6 +47,16 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint) {
   if (get_a_line(stdin, line)) exit(1);
   *nprint = atoi(line);
 
+  if (get_a_line(stdin, line)) exit(1);
+  sys->m = atof(line);
+  if (get_a_line(stdin, line)) exit(1);
+  sys->De = atof(line);
+  if (get_a_line(stdin, line)) exit(1);
+  sys->a = atof(line);
+  if (get_a_line(stdin, line)) exit(1);
+  sys->re = atof(line);
+  
+
   /* allocate memory */
   sys->rx = (double *)malloc(sys->natoms*sizeof(double));
   sys->ry = (double *)malloc(sys->natoms*sizeof(double));
@@ -85,25 +95,21 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint) {
   #ifdef MY_MPI
   }
   MPI_Bcast(&sys->natoms, 1, MPI_INTEGER, 0, MPI_COMM_WORLD);
-
   MPI_Bcast(&sys->mass, 1, MPI_INTEGER, 0, MPI_COMM_WORLD);
-
   MPI_Bcast(&sys->epsilon, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
   MPI_Bcast(&sys->sigma, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
   MPI_Bcast(&sys->rcut, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
   MPI_Bcast(&sys->box, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
   MPI_Bcast(&sys->nsteps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD);
-
   MPI_Bcast(&sys->dt, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
   MPI_Bcast(nprint, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  MPI_Bcast(&sys->m, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&sys->De, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&sys->a, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&sys->re, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
   if (sys->mpirank) {
-    printf("PE = %i, Atoms = %i, Threads = %i, nprint = %i\n",
-           myPE, sys->natoms, sys->nthreads, *nprint);
     sys->rx = (double *)malloc(sys->natoms*sizeof(double));
     sys->ry = (double *)malloc(sys->natoms*sizeof(double));
     sys->rz = (double *)malloc(sys->natoms*sizeof(double));

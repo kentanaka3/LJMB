@@ -9,9 +9,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=49000MB
 #SBATCH  -p boost_usr_prod
-#SBATCH -e error-%j.err
-#SBATCH -o output-%j.out
+#SBATCH -e %j_#_#.err
+#SBATCH -o %j_#_#.out
 
 export OMP_NUM_THREADS=#
-#module load openmpi/4.1.4--nvhpc--23.1-cuda-11.8 openblas/0.3.21--nvhpc--23.1
 ../build/MAIN.x < $1
