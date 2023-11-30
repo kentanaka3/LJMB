@@ -10,3 +10,7 @@ argon_78732.dat   # energies
 20                # nr MD steps
 5.0               # MD time step (in fs)
 5                 # output print frequency
+-0.05             # m
+0.05              # De
+2.0               # a
+3.141592          # re
