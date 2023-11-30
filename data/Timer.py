@@ -5,21 +5,19 @@ atom = re.compile( r"^Starting simulation with (?P<atoms>\d+)")
 z = 0
 m = re.compile(r"^(?P<name>\w+):\s(?P<calls>\d+)")
 n = re.compile(r"(\d+) *")
-o = re.compile(r"\w+_(?P<node>\d+)_(?P<thread>).out")
+o = re.compile(r"\d+_(?P<node>\d+)_(?P<thread>\d+).out")
 x = 0
 y = 0
-M = {}
 for arg in range(1, len(sys.argv)):
-  pathname = os.path.join("Timer", arg)
+  M = {}
+  pathname = os.path.join("Timer", sys.argv[arg])
   for i in sorted(os.listdir(pathname), reverse=False):
     if i.endswith(".out"):
-      node = 0
-      thread = 0
+      key = ""
       files = o.match(i)
       if files:
-        node = files.group("node")
-        thread = files.group("thread")
-        M.setdefault((node, thread), dict())
+        key = "_" + files.group("node") + "_" + files.group("thread")
+        M.setdefault(key, dict())
       Timing = {}
       z = 0
       with open(os.path.join(pathname, i), 'r') as fr:
@@ -28,7 +26,7 @@ for arg in range(1, len(sys.argv)):
           atoms = atom.match(L)
           if atoms:
             z = int(atoms.group("atoms"))
-            M[(node, thread)][z] = dict()
+            M[key][z] = dict()
           L = fr.readline()
         L = fr.readlines()
       name = ""
@@ -42,18 +40,41 @@ for arg in range(1, len(sys.argv)):
           a = max(a)
           if Timing[name][1] < a:
             Timing[name][1] = a
-      M[(node, thread)][z] = Timing
-  x = list(M[(node, thread)].keys())
-  y = [0]*len(x)
-  titles = [title for title in M[(node, thread)][x[0]]]
-  for t in titles:
-    with open(os.path.join(pathname, t + ".dat"), 'w') as fr:
-      fr.write("# " + t + "\n")
-  for t in titles:
-    with open(os.path.join(pathname, t + ".dat"), 'a') as fr:
-      for i, j in enumerate(x):
-        y[i] = M[(node, thread)][j][t][1]/M[(node, thread)][j][t][0]
-        fr.write(str(j) + "\t" + str(y[i]) + "\n")
+      M[key][z] = Timing
+  if len(M.keys()) > 1:
+    x = []
+    y = []
+    for a in M.keys():
+      files = o.match(a)
+      if files:
+        x.append(files.group("node"))
+        y.append(files.group("thread"))
+    if len(y) > 1:
+      x, y = y, x
+    
+    titles = [title for title in M[a][x[0]]]
+    for t in titles:
+      with open(os.path.join(pathname, t + a + "_tk.dat"), 'w') as fr:
+        fr.write("# " + t + "\n")
+    for t in titles:
+      with open(os.path.join(pathname, t + a + "_tk.dat"), 'a') as fr:
+        for i, j in enumerate(x):
+          y[i] = M[a][j][t][1]/M[a][j][t][0]
+          fr.write(str(j) + "\t" + str(y[i]) + "\n")
+    os.system(f"gnuplot -c Timer.plt {t} {sys.argv[arg]} \"{' '.join(M.keys())}\" Task")
 
-for t in titles:
-  os.system("gnuplot -c Timer.plt " + t + " " + " ".join(sys.argv[1:]))
+  for a in M.keys():
+    x = list(M[a].keys())
+    y = [0]*len(x)
+    titles = [title for title in M[a][x[0]]]
+    for t in titles:
+      with open(os.path.join(pathname, t + a + "_sz.dat"), 'w') as fr:
+        fr.write("# " + t + "\n")
+    for t in titles:
+      with open(os.path.join(pathname, t + a + "_sz.dat"), 'a') as fr:
+        for i, j in enumerate(x):
+          y[i] = M[a][j][t][1]/M[a][j][t][0]
+          fr.write(str(j) + "\t" + str(y[i]) + "\n")
+
+  for t in titles:
+    os.system(f"gnuplot -c Timer.plt {t} {sys.argv[arg]} \"{' '.join(M.keys())}\" Size")

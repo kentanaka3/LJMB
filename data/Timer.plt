@@ -1,4 +1,20 @@
-set term png
-set output "../img/".ARG1.".png"
+set term png size 500,300
 set logscale
-plot "Timer/".ARG2."/".ARG1.".dat" w l title ARG2
+set grid
+set title ARG2." ".ARG1
+set ylabel "Time (ms)"
+set format y "10^{%T}"
+if (ARG4 eq "Size") {
+  set output "../img/".ARG2."_".ARG1."_sz.png"
+  set format x "10^{%T}"
+  set xrange [100:100000]
+  set xlabel "System Size"
+  plot for [i=1:words(ARG3)] "Timer/".ARG2."/".ARG1.word(ARG3, i)."sz.dat" w lp title word(ARG3, i)
+} else {
+  set output "../img/".ARG2."_".ARG1."_tk.png"
+  set xrange [1:40]
+  set xlabel "# Tasks"
+  do for [i=1:words(ARG3)] {
+    plot "Timer/".ARG2."/".ARG1.word(ARG3, i)."tk.dat" w lp title word(ARG3, i)
+  }
+}
