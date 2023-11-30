@@ -1,5 +1,4 @@
+#ifdef MY_MPI
 #include <mpi.h>
-#ifndef MY_MPI
-  #define MY_MPI
+int myPE, nPEs;
 #endif
-int mype, npes, n_loc, rest, tmp;

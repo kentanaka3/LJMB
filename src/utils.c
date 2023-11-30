@@ -3,7 +3,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <math.h>
 
 /* helper function: zero out an array */
 void azzero(double *d, const int n) {
@@ -40,5 +39,4 @@ int get_a_line(FILE *fp, char *buf) {
     perror("problem reading input");
     return -1;
   }
-  return 0;
 }

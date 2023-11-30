@@ -8,9 +8,9 @@
 /*velocity verlet part two*/
 void velverlet_prop(mdsys_t *sys){
   /* Propagate velocities by another half step */
-  #ifdef _OPENMP
-  #pragma omp parallel for
-  #endif
+  //#ifdef _OPENMP
+  //#pragma omp parallel for
+  //#endif
   for (int i = 0; i < sys->natoms; ++i) {
     sys->vx[i] += 0.5*sys->dt / MVSQ2E * sys->fx[i] / sys->mass;
     sys->vy[i] += 0.5*sys->dt / MVSQ2E * sys->fy[i] / sys->mass;
@@ -21,9 +21,9 @@ void velverlet_prop(mdsys_t *sys){
 /* Velocity verlet part one */
 void velverlet(mdsys_t *sys) {
   /* Propagate velocities by half and positions by full step */
-  #ifdef _OPENMP
-  #pragma omp parallel for
-  #endif 
+  //#ifdef _OPENMP
+  //#pragma omp parallel for
+  //#endif 
   for (int i = 0; i < sys->natoms; ++i) {
     sys->vx[i] += 0.5*sys->dt / MVSQ2E * sys->fx[i] / sys->mass;
     sys->vy[i] += 0.5*sys->dt / MVSQ2E * sys->fy[i] / sys->mass;

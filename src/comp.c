@@ -1,10 +1,14 @@
 #include "structs.h"
 #include "utils.h"
 #ifdef MY_MPI
-#include "myMPI.hpp"
+#include <mpi.h>
 #endif
-#ifdef _OPENMP
+#if defined (_OPENMP)
 #include <omp.h>
+#endif
+
+#ifdef MORSE
+
 #endif
 
 /* Compute Kinetic Energy */
@@ -20,85 +24,94 @@ void ekin(mdsys_t *sys) {
 
 /* compute forces */
 void force(mdsys_t *sys) {
-  double rsq, ffac;
-  double rx, ry, rz;
-  int i, j, ii;
-  int tid=0;
-  /* zero energy and forces */
   double epot = 0.0;
+  /* zero energy and forces */
   #ifdef MY_MPI
-  MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
-  MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
-  MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, sys->mpicomm);
+  MPI_Bcast(sys->rx, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->ry, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(sys->rz, sys->natoms, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   #endif
-  double c6 = 1.0, c12, rcsq;
-  for (i = 0; i < 6; i++) c6 *= sys->sigma;
-  c12 = 4.0*sys->epsilon*c6*c6;
-  c6 *= 4.0*sys->epsilon;
-  rcsq = sys->rcut*sys->rcut;
-  #ifdef _OPENMP
+  #if defined (_OPENMP)
   #pragma omp parallel reduction(+:epot)
-  tid=omp_get_thread_num(); //thread number as thread "rank"
   #endif
   {
-    double rx1,ry1,rz1;
-    int fromidx,toidx;
-    azzero(sys->cx+tid*sys->natoms, sys->natoms);
-    azzero(sys->cy+tid*sys->natoms, sys->natoms);
-    azzero(sys->cz+tid*sys->natoms, sys->natoms);
-    for (i = 0; i < (sys->natoms) - 1; i += sys->nsize+sys->nthreads) {
-      ii = i + sys->mpirank+tid;
-      if (ii >= (sys->natoms - 1)) break;
-      rx1=sys->rx[ii];
-      ry1=sys->ry[ii];
-      rz1=sys->rz[ii]; 
-      for (j = i + 1; j < (sys->natoms); ++j) {
-        /* Get distance between particle i and j */
-        rx = pbc(rx1 - sys->rx[j], 0.5*sys->box);
-        ry = pbc(rx1 - sys->ry[j], 0.5*sys->box);
-        rz = pbc(rz1 - sys->rz[j], 0.5*sys->box);
-        rsq = rx*rx + ry*ry + rz*rz;
-        double rinv = 1.0;
-        for (int k = 0; k < 3; k++) rinv /= rsq;
-        /* Compute Force and Energy if within cutoff */
-        if (rsq < rcsq) {
-          ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
-          epot += (c12*rinv - c6)*rinv;
+  #if defined (_OPENMP)
+  int tid = omp_get_thread_num(); //thread number as thread "rank"
+  #else
+  sys->nthreads = 1;
+  int tid = 0;
+  #endif
+  double *fx, *fy, *fz;
+  fx = sys->cx + (tid*sys->natoms);
+  fy = sys->cy + (tid*sys->natoms);
+  fz = sys->cz + (tid*sys->natoms);
+  azzero(fx, sys->natoms);
+  azzero(fy, sys->natoms);
+  azzero(fz, sys->natoms);
+  double c6, c12, rcsq = sys->rcut*sys->rcut;
+  c6 = sys->sigma*sys->sigma*sys->sigma*sys->sigma*sys->sigma*sys->sigma;
+  c12 = 4.0*sys->epsilon*c6*c6;
+  c6 *= 4.0*sys->epsilon;
+  for (int i = 0; i < (sys->natoms) - 1; i += sys->nsize * sys->nthreads) {
+    int ii = i + sys->mpirank * sys->nthreads + tid;
+    if (ii >= (sys->natoms - 1)) break;
+    double rx1 = sys->rx[ii];
+    double ry1 = sys->ry[ii];
+    double rz1 = sys->rz[ii];
+    for (int jj = ii + 1; jj < (sys->natoms); ++jj) {
+      /* Get distance between particle i and jj */
+      double rx = pbc(rx1 - sys->rx[jj], 0.5*sys->box);
+      double ry = pbc(ry1 - sys->ry[jj], 0.5*sys->box);
+      double rz = pbc(rz1 - sys->rz[jj], 0.5*sys->box);
+      double rsq = rx*rx + ry*ry + rz*rz;
+      /* Compute Force and Energy if within cutoff */
+      if (rsq < rcsq) {
+        /* Morse Potential
+        MM = exp(- sys->a * (r - sys->re));
+        // Mores potential
+        sys->epot += sys->m + sys->De * (1-MM)*(1-MM);
+        ffac = 2 * sys->a * sys->De * MM * (1-MM);
+         */
+        double rinv = ((1.0 / rsq) / rsq) / rsq;
+        double ffac = 6.0*(2.0*c12*rinv - c6)*rinv/rsq;
+        epot += (c12*rinv - c6)*rinv;
 
-          sys->fx[i] += rx*ffac;
-          sys->fy[i] += ry*ffac;
-          sys->fz[i] += rz*ffac;
-          sys->cx[j] -= rx*ffac;
-          sys->cy[j] -= ry*ffac;
-          sys->cz[j] -= rz*ffac;
-        }
-      }
-    }
-    #ifdef _OPENMP
-    #pragma omp barrier
-    #endif
-    sys->epot += epot;
-    i=1+(sys->natoms/sys->nthreads);
-    fromidx=tid*i;
-    toidx=fromidx+i;
-    if (toidx>sys->natoms) toidx = sys->natoms;
+        fx[ii] += rx*ffac;
+        fy[ii] += ry*ffac;
+        fz[ii] += rz*ffac;
 
-    for (i=1;i<sys->nthreads;++i) {
-      int offs = i*sys->natoms;
-      for (int j=fromidx;j<toidx;++j){
-        sys->fx[j]+=sys->fx[offs+j];
-        sys->fx[j]+=sys->fy[offs+j];
-        sys->fz[j]+=sys->fz[offs+j];
+        fx[jj] -= rx*ffac;
+        fy[jj] -= ry*ffac;
+        fz[jj] -= rz*ffac;
       }
     }
   }
+  #if defined (_OPENMP)
+  #pragma omp barrier
+  #endif
+  int i = (sys->natoms/sys->nthreads) + 1;
+  int fromidx = tid * i;
+  int toidx = fromidx + i;
+  if (toidx > sys->natoms) toidx = sys->natoms;
+  for (int i = 1; i < sys->nthreads; ++i) {
+    int offs = i*sys->natoms;
+    for (int j = fromidx; j < toidx; ++j) sys->cx[j] += sys->cx[offs + j];
+    for (int j = fromidx; j < toidx; ++j) sys->cy[j] += sys->cy[offs + j];
+    for (int j = fromidx; j < toidx; ++j) sys->cz[j] += sys->cz[offs + j];
+  }
+  }
   #ifdef MY_MPI
   MPI_Reduce(sys->cx, sys->fx, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-             sys->mpicomm);
+             MPI_COMM_WORLD);
   MPI_Reduce(sys->cy, sys->fy, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-             sys->mpicomm);
+             MPI_COMM_WORLD);
   MPI_Reduce(sys->cz, sys->fz, sys->natoms, MPI_DOUBLE, MPI_SUM, 0,
-             sys->mpicomm);
-  MPI_Reduce(&epot, %sys->epot, 1, MPI_DOUBLE, MPI_SUM, 0, sys->mpicomm);
+             MPI_COMM_WORLD);
+  MPI_Reduce(&epot, &(sys->epot), 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+  #else
+  for (int i = 0; i < sys->natoms; i++) sys->fx[i] = sys->cx[i];
+  for (int i = 0; i < sys->natoms; i++) sys->fy[i] = sys->cy[i];
+  for (int i = 0; i < sys->natoms; i++) sys->fz[i] = sys->cz[i];
+  sys->epot = epot;
   #endif
 }
