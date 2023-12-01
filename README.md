@@ -9,7 +9,7 @@ A simple Lennard-Jones Many-Body (LJMB) Simulator Optimization and Parallelizati
 Compile with cmake -S . -B build -D LJMD_MPI=ON -D LJMD_OPENMP=ON; for compiler optimization flags, add -DCMAKE_CXX_FLAGS="-O3 -Wall -ffast-math -fexpensive-optimizations -msse3".
 From command line, while in LJMB/data folder:
 1) export export OMP_NUM_THREADS=<n. threads>
-2) mpirun --bind-to socket -np <n. processing elements> ../build/MAIN.x < <chosen .inp file> 
+2) mpirun --bind-to-socket -np <n. processing elements> ../build/MAIN.x < <chosen .inp file> 
 Input .inp and .rest files, output .dat and .xyz files can be found in LJMB/data; outputs can be compared with references in LJMB/data/refs folder. 
 
 ## Functions
@@ -36,7 +36,10 @@ The implemented test framework for the separated functions is GoogleTest. The sr
 - test_utils -> testing azzero, pbc functions 
 - test_verlet -> testing velverlet, velverlet_prop functions
 
-## Comparison
+## Benchmarks
+We performed a series of runs on the Leonardo HPC supercomputer hosted by CINECA, using the Booster partition with 32 cores per node. We used --bind-to-socket for runnings. 
+Benchmarks executed during these runs consider the timings and number of calls for Force, Velverlet, Propagate, Kinetic Energy computation functions, as well as the total Run Time, under several configurations of number of processing elements (cores), number of threads, and number of nodes.
+
 ### Serial
 Serial runs without optimizations.
 ![Run Time](img/RunTime.png)
@@ -99,7 +102,7 @@ Parallel runs with:
 - Number of Leonardo nodes: 1;
 - Number of processing elements: 2, 4, 6, 8, 16, 32;
 - Number of threads: 2, 4, 6, 8, 16, 32.
-maintaining npes*threads < 32 (number of cores in a Leonardo node)
+Number of proc. elements*threads < 32 (max number of cores in a Leonardo node).
 
 ![RunTime Size](img/MPI_OpenMP_RunTime_sz.png)
 ![RunTime Task](img/MPI_OpenMP_Force_tk.png)
