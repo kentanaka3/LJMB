@@ -118,7 +118,6 @@ for arg in range(1, len(sys.argv)):
             with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
               fr.write(f"\n")
 
-
   for a in M.keys():
     x = list(M[a].keys())
     y = [0]*len(x)
@@ -130,3 +129,5 @@ for arg in range(1, len(sys.argv)):
         for i, j in enumerate(x):
           y[i] = M[a][j][t][1]/M[a][j][t][0]
           fr.write(str(j) + "\t" + str(y[i]) + "\n")
+
+os.system("make plot")
