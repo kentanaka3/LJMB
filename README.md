@@ -5,6 +5,13 @@ A simple Lennard-Jones Many-Body (LJMB) Simulator Optimization and Parallelizati
 - Fathi  -> mpi
 - Ken    -> optimization
 
+## Running
+Compile with cmake -S . -B build -D LJMD_MPI=ON -D LJMD_OPENMP=ON; for compiler optimization flags, add -DCMAKE_CXX_FLAGS="-O3 -Wall -ffast-math -fexpensive-optimizations -msse3".
+From command line, while in LJMB/data folder:
+1) export export OMP_NUM_THREADS=<n. threads>
+2) mpirun --bind-to socket -np <n. processing elements> ../build/MAIN.x < <chosen .inp file> 
+Input .inp and .rest files, output .dat and .xyz files can be found in LJMB/data; outputs can be compared with references in LJMB/data/refs folder. 
+
 ## Functions
 Splitted functions source files are in LJMD/src:
 - main.cpp: main function
@@ -30,7 +37,7 @@ The implemented test framework for the separated functions is GoogleTest. The sr
 - test_verlet -> testing velverlet, velverlet_prop functions
 
 ## Comparison
-# Serial
+### Serial
 Serial runs without optimizations.
 ![Run Time](img/RunTime.png)
 ![Force](img/Force.png)
@@ -39,7 +46,7 @@ Serial runs without optimizations.
 ![KineticEnergy](img/KineticEnergy.png)
 ![Start Up](img/StartupTime.png)
 
-# Optimized
+### Optimized
 Serial runs with "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compiler flags and code optimizations (Newton's 3rd law, expensive math operations avoided).
 
 ![RunTime Size](img/Optimized_RunTime_sz.png)
@@ -53,7 +60,7 @@ Serial runs with "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compil
 ![Kinetic Energy Size](img/Optimized_KineticEnergy_sz.png)
 ![Kinetic Energy Task](img/Optimized_Force_tk.png)
 
-# MPI
+### MPI
 Parallel runs with:
 - Number of Leonardo nodes: 1;
 - Number of processing elements: 2, 4, 8, 16, 32;
@@ -70,7 +77,7 @@ Parallel runs with:
 ![Kinetic Energy Size](img/MPI_KineticEnergy_sz.png)
 ![Kinetic Energy Task](img/MPI_Force_tk.png)
 
-# OpenMP
+### OpenMP
 Parallel runs with:
 - Number of Leonardo nodes: 1;
 - Number of processing elements: 1;
@@ -87,9 +94,20 @@ Parallel runs with:
 ![Kinetic Energy Size](img/OpenMP_KineticEnergy_sz.png)
 ![Kinetic Energy Task](img/OpenMP_Force_tk.png)
 
-# MPI+OpenMP
+### MPI+OpenMP
 Parallel runs with: 
 - Number of Leonardo nodes: 1;
 - Number of processing elements: 2, 4, 6, 8, 16, 32;
 - Number of threads: 2, 4, 6, 8, 16, 32.
 maintaining npes*threads < 32 (number of cores in a Leonardo node)
+
+![RunTime Size](img/MPI_OpenMP_RunTime_sz.png)
+![RunTime Task](img/MPI_OpenMP_Force_tk.png)
+![Force Size](img/MPI_OpenMP_Force_sz.png)
+![Force Task](img/MPI_OpenMP_Force_tk.png)
+![Velverlet Size](img/MPI_OpenMP_Velverlet_sz.png)
+![Velverlet Task](img/MPI_OpenMP_Velverlet_tk.png)
+![Propagate Size](img/MPI_OpenMP_Propagate_sz.png)
+![Propagate Task](img/MPI_OpenMP_Propagate_tk.png)
+![Kinetic Energy Size](img/MPI_OpenMP_KineticEnergy_sz.png)
+![Kinetic Energy Task](img/MPI_OpenMP_Force_tk.png)
