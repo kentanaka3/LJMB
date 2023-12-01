@@ -26,6 +26,16 @@ plot:
 	gnuplot -c Timer.plt Propagate "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
 	gnuplot -c Timer.plt RunTime "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
 	gnuplot -c Timer.plt Velverlet "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
+	gnuplot -c Timer.plt Force "MPI" "_108 _2916 _78732" Task
+	gnuplot -c Timer.plt KineticEnergy "MPI" "_108 _2916 _78732" Task
+	gnuplot -c Timer.plt Propagate "MPI" "_108 _2916 _78732" Task
+	gnuplot -c Timer.plt RunTime "MPI" "_108 _2916 _78732" Task
+	gnuplot -c Timer.plt Velverlet "MPI" "_108 _2916 _78732" Task
+	gnuplot -c Timer.plt Force "OpenMP" "_108 _2916 _78732" Task
+	gnuplot -c Timer.plt KineticEnergy "OpenMP" "_108 _2916 _78732" Task
+	gnuplot -c Timer.plt Propagate "OpenMP" "_108 _2916 _78732" Task
+	gnuplot -c Timer.plt RunTime "OpenMP" "_108 _2916 _78732" Task
+	gnuplot -c Timer.plt Velverlet "OpenMP" "_108 _2916 _78732" Task
 clean:
 	rm -f *.dat
 	rm -f *.xyz

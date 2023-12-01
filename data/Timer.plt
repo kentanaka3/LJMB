@@ -14,7 +14,5 @@ if (ARG4 eq "Size") {
   set output "../img/".ARG2."_".ARG1."_tk.png"
   set xrange [1:40]
   set xlabel "# Tasks"
-  do for [i=1:words(ARG3)] {
-    plot "Timer/".ARG2."/".ARG1.word(ARG3, i)."tk.dat" w lp title word(ARG3, i)
-  }
+  plot for [i=1:words(ARG3)] "Timer/".ARG2."/".ARG1.word(ARG3, i)."_tk.dat" w lp title word(ARG3, i)
 }
