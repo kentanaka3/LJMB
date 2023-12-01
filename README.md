@@ -54,7 +54,11 @@ Parallel runs by Message Passing Interface implementation with:
 - Number of nodes: 1;
 - Number of processing elements: 2, 4, 8, 16, 32;
 - Number of threads: 1.
-The MPI code parts are activated by *#ifdef MY_MPI [...] #endif*, set by -D LJMB_MPI=ON at compiling. Mpirank = 0 and number of processing elements are stored as default members of the *sys struct in case of -np = 1 or overwritten by each processor when np>1. MPI is mostly employed here to speed up the force computation by splitting it among different processing units, on top of the application of the Optmized code/compiling.  
+The MPI code parts are activated by *#ifdef MY_MPI [...] #endif*, set by -D LJMB_MPI=ON at compiling. Mpirank = 0 and number of processing elements are stored as default members of the *sys struct in case of -np = 1 or overwritten by each processor when np>1. MPI is mostly employed here to speed up the Force computation, by splitting it among different arrays of atoms managed by different processing units. This is generally made possible in Force function by: 
+- broadcasting the position of atoms among processes
+- creating indices employed by loop control flows dependent on the number of processes and their ranks,
+- using dedicated buffers for the storage of computed forces 
+- and finally reducing the forces computed by all processes and the total energy potential back into rank 0 process. This is done on top of the already implemented Optimized code.  
 
 ![RunTime Size](img/MPI_RunTime_sz.png)
 ![RunTime Task](img/MPI_Force_tk.png)
@@ -66,7 +70,10 @@ Parallel runs with Open Multiprocessing implementation with:
 - Number of nodes: 1;
 - Number of processing elements: 1;
 - Number of threads: 2, 4, 6, 8, 16, 32.
-The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #endif* when -D LJMB_OPENMP=ON at compiling. Similarly to MPI, OpenMP divides the force computation among different threads, actually following an MPI-like hybrid approach to deal with thread 
+The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #endif* when -D LJMB_OPENMP=ON at compiling. Similarly to MPI, OpenMP divides the force computation among different threads, actually following an MPI-like hybrid approach:
+- creation of a parallel region, with reduction for the sum of all energy potentials;  
+- each thread uses its own buffer pointers to hold full array of atoms, selected depending on the thread id, thus eliminating any race condition 
+- after the computation of forces by each thread, an *omp barrier* is raised to synchronize the results of forces computed from all threads and reduce them in a parallel way, dependent on the number of threads. This is still done on top of the Optimized version of the Force function. 
 
 ![RunTime Size](img/OpenMP_RunTime_sz.png)
 ![RunTime Task](img/OpenMP_Force_tk.png)
@@ -74,16 +81,21 @@ The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #
 ![Force Task](img/OpenMP_Force_tk.png)
 
 ### MPI+OpenMP
-Parallel runs with: 
+Parallel runs using both MPI and OpenMP with: 
 - Number of nodes: 1;
 - Number of processing elements: 2, 4, 6, 8, 16, 32;
 - Number of threads: 2, 4, 6, 8, 16, 32.
 Number of proc. elements*threads < 32 (maximum number of cores in a Leonardo node in Booster).
+This hybrid approach is done in an "orthogonal" way, where the MPI and OpenMP cohexist by using buffers with increased sizes, indices depending on nPEs and number of threads, as well as on the processor rank and thread id, and making sure that the MPI calls are not done inside the OpenMP parallel region.  
 
 ![Force Tasks/Threads](img/MPI_OpenMP_Force__108.png)
 
-In case of the smaller size, there is actually no scaling in the system, meaning that there is no speedup from increasing the number of npes or from threads.
+In the case of the smallest system size (108), there is no real scaling in the Force computations timings normalized by their calls, since the timings are practically constant. This means that there would no speedup from increasing the number of npes or threads.
+
 ![Force Tasks/Threads](img/MPI_OpenMP_Force__2916.png)
+
+However, by increasing the system size (2916),   
+
 ![Force Tasks/Threads](img/MPI_OpenMP_Force__78732.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__108.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__2916.png)
