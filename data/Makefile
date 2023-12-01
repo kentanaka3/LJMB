@@ -37,6 +37,7 @@ plot:
 	gnuplot -c Timer.plt RunTime "OpenMP" "_108 _2916 _78732" Task
 	gnuplot -c Timer.plt Velverlet "OpenMP" "_108 _2916 _78732" Task
 	gnuplot -c Mtx.plt "Force KineticEnergy Propagate RunTime Velverlet" "_108 _2916 _78732"
+	gnuplot -c SpeedUp.plt "Force KineticEnergy Propagate RunTime Velverlet" "_108 _2916 _78732"
 clean:
 	rm -f *.dat
 	rm -f *.xyz
