@@ -50,11 +50,11 @@ However, these optimizations determine a known floating point divergence between
 The optimizations, as expected, determine speedups in the execution of the Force computation time.
 
 ### MPI
-Parallel runs by Message Passing with:
+Parallel runs by Message Passing Interface implementation with:
 - Number of nodes: 1;
 - Number of processing elements: 2, 4, 8, 16, 32;
 - Number of threads: 1.
-The MPI code parts are activated by *#ifdef MY_MPI [...] *#endif, set by -D LJMB_MPI=ON at compiling. A mpirank = 0 member for the *sys struct is set by default.  
+The MPI code parts are activated by *#ifdef MY_MPI [...] #endif*, set by -D LJMB_MPI=ON at compiling. Mpirank = 0 and number of processing elements are stored as default members of the *sys struct in case of -np = 1 or overwritten by each processor when np>1. MPI is mostly employed here to speed up the force computation by splitting it among different processing units, on top of the application of the Optmized code/compiling.  
 
 ![RunTime Size](img/MPI_RunTime_sz.png)
 ![RunTime Task](img/MPI_Force_tk.png)
@@ -62,10 +62,11 @@ The MPI code parts are activated by *#ifdef MY_MPI [...] *#endif, set by -D LJMB
 ![Force Task](img/MPI_Force_tk.png)
 
 ### OpenMP
-Parallel runs with:
+Parallel runs with Open Multiprocessing implementation with:
 - Number of nodes: 1;
 - Number of processing elements: 1;
 - Number of threads: 2, 4, 6, 8, 16, 32.
+The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #endif* when -D LJMB_OPENMP=ON at compiling. Similarly to MPI, OpenMP divides the force computation among different threads, actually following an MPI-like hybrid approach to deal with thread 
 
 ![RunTime Size](img/OpenMP_RunTime_sz.png)
 ![RunTime Task](img/OpenMP_Force_tk.png)
@@ -80,6 +81,8 @@ Parallel runs with:
 Number of proc. elements*threads < 32 (maximum number of cores in a Leonardo node in Booster).
 
 ![Force Tasks/Threads](img/MPI_OpenMP_Force__108.png)
+
+In case of the smaller size, there is actually no scaling in the system, meaning that there is no speedup from increasing the number of npes or from threads.
 ![Force Tasks/Threads](img/MPI_OpenMP_Force__2916.png)
 ![Force Tasks/Threads](img/MPI_OpenMP_Force__78732.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__108.png)
