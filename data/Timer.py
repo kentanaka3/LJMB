@@ -78,4 +78,6 @@ for arg in range(1, len(sys.argv)):
           fr.write(str(j) + "\t" + str(y[i]) + "\n")
 
   for t in titles:
-    os.system(f"gnuplot -c Timer.plt {t} {sys.argv[arg]} \"{' '.join(M.keys())}\" Size")
+    cmd = f"gnuplot -c Timer.plt {t} {sys.argv[arg]} \"{' '.join(M.keys())}\" Size"
+    print(cmd)
+    os.system(cmd)
