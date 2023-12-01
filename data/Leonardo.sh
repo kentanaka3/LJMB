@@ -13,4 +13,4 @@
 #SBATCH -o %j_#_#_#.out
 
 export OMP_NUM_THREADS=#
-mpirun --bind-to socket ../build/MAIN.x < $1
+mpirun --bind-to-socket ../build/MAIN.x < $1
