@@ -40,52 +40,26 @@ The implemented test framework for the separated functions is GoogleTest. The sr
 We performed a series of benchmarks on the Leonardo HPC supercomputer hosted by CINECA, using the Booster partition with 32 cores per node. 
 These benchmarks consider the timings and number of calls, depending on the simulation sizes (108, 2916, 78732 atoms) for the Force, Velverlet, Propagate, Kinetic Energy computation functions, as well as the total Run Time, under several configurations of number of processing elements (cores), number of threads, and number of nodes. 
 
-### Serial
-Serial runs without optimizations.
-![Run Time](img/RunTime.png)
-![Force](img/Force.png)
-![Velverlet](img/Velverlet.png)
-![Propagate](img/Propagate.png)
-![KineticEnergy](img/KineticEnergy.png)
-![Start Up](img/StartupTime.png)
-
-### Optimized
-Serial runs with "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compiler flags and code optimizations: specifically,the application of Newton's 3rd law for Forces computation (in comp.c function) and avoiding time expensive math functions like pow(), sqrt(), division. 
+### Serial vs. Optimized
+Serial runs without optimizations are here compared against analog runs with "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compiler flags and code optimizations: specifically,the application of Newton's 3rd law for Forces computation (in comp.c function) and avoiding time expensive math functions like pow(), sqrt(), division. 
 However, these optimizations determine a known floating point divergence between the simulation results and the reference datasets, which is especially evident using 108 atoms for the simulation size.  
-
-![RunTime Size](img/Optimized_RunTime_sz.png)
-![RunTime Task](img/Optimized_Force_tk.png)
-![Force Size](img/Optimized_Force_sz.png)
-![Force Task](img/Optimized_Force_tk.png)
-![Velverlet Size](img/Optimized_Velverlet_sz.png)
-![Velverlet Task](img/Optimized_Velverlet_tk.png)
-![Propagate Size](img/Optimized_Propagate_sz.png)
-![Propagate Task](img/Optimized_Propagate_tk.png)
-![Kinetic Energy Size](img/Optimized_KineticEnergy_sz.png)
-![Kinetic Energy Task](img/Optimized_Force_tk.png)
-
-The optimizations, as expected, mostly determine speedups in the execution of the Force computation time:
 
 ![Serial vs Optimized Force](img/SerialComp_Force_sz.png)
 ![Serial vs Optimized RunTime](img/SerialComp_RunTime_sz.png)
+
+The optimizations, as expected, determine speedups in the execution of the Force computation time.
 
 ### MPI
 Parallel runs by Message Passing with:
 - Number of nodes: 1;
 - Number of processing elements: 2, 4, 8, 16, 32;
 - Number of threads: 1.
-The MPI code parts are activated by "ifdef MY_MPI
+The MPI code parts are activated by *#ifdef MY_MPI [...] *#endif, set by -D LJMB_MPI=ON at compiling. A mpirank = 0 member for the *sys struct is set by default.  
 
 ![RunTime Size](img/MPI_RunTime_sz.png)
 ![RunTime Task](img/MPI_Force_tk.png)
 ![Force Size](img/MPI_Force_sz.png)
 ![Force Task](img/MPI_Force_tk.png)
-![Velverlet Size](img/MPI_Velverlet_sz.png)
-![Velverlet Task](img/MPI_Velverlet_tk.png)
-![Propagate Size](img/MPI_Propagate_sz.png)
-![Propagate Task](img/MPI_Propagate_tk.png)
-![Kinetic Energy Size](img/MPI_KineticEnergy_sz.png)
-![Kinetic Energy Task](img/MPI_Force_tk.png)
 
 ### OpenMP
 Parallel runs with:
@@ -97,12 +71,6 @@ Parallel runs with:
 ![RunTime Task](img/OpenMP_Force_tk.png)
 ![Force Size](img/OpenMP_Force_sz.png)
 ![Force Task](img/OpenMP_Force_tk.png)
-![Velverlet Size](img/OpenMP_Velverlet_sz.png)
-![Velverlet Task](img/OpenMP_Velverlet_tk.png)
-![Propagate Size](img/OpenMP_Propagate_sz.png)
-![Propagate Task](img/OpenMP_Propagate_tk.png)
-![Kinetic Energy Size](img/OpenMP_KineticEnergy_sz.png)
-![Kinetic Energy Task](img/OpenMP_Force_tk.png)
 
 ### MPI+OpenMP
 Parallel runs with: 
@@ -115,9 +83,3 @@ Number of proc. elements*threads < 32 (maximum number of cores in a Leonardo nod
 ![RunTime Task](img/MPI_OpenMP_Force_tk.png)
 ![Force Size](img/MPI_OpenMP_Force_sz.png)
 ![Force Task](img/MPI_OpenMP_Force_tk.png)
-![Velverlet Size](img/MPI_OpenMP_Velverlet_sz.png)
-![Velverlet Task](img/MPI_OpenMP_Velverlet_tk.png)
-![Propagate Size](img/MPI_OpenMP_Propagate_sz.png)
-![Propagate Task](img/MPI_OpenMP_Propagate_tk.png)
-![Kinetic Energy Size](img/MPI_OpenMP_KineticEnergy_sz.png)
-![Kinetic Energy Task](img/MPI_OpenMP_Force_tk.png)
