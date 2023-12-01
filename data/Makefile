@@ -10,6 +10,12 @@ organize:
 	mv *_01_*_01.out Timer/MPI
 	mv *_01_*_*.out Timer/MPI_OpenMP
 	rm *.err
+plot:
+	gnuplot -c SerialComp.plt Force "Serial Optimization"
+	gnuplot -c SerialComp.plt KineticEnergy "Serial Optimization"
+	gnuplot -c SerialComp.plt Propagate "Serial Optimization"
+	gnuplot -c SerialComp.plt RunTime "Serial Optimization"
+	gnuplot -c SerialComp.plt Velverlet "Serial Optimization"
 clean:
 	rm -f *.dat
 	rm -f *.xyz

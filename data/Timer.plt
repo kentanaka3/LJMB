@@ -9,7 +9,7 @@ if (ARG4 eq "Size") {
   set format x "10^{%T}"
   set xrange [100:100000]
   set xlabel "System Size"
-  plot for [i=1:words(ARG3)] "Timer/".ARG2."/".ARG1.word(ARG3, i)."sz.dat" w lp title word(ARG3, i)
+  plot for [i=1:words(ARG3)] "Timer/".ARG2."/".ARG1.word(ARG3, i)."_sz.dat" w lp title word(ARG3, i)
 } else {
   set output "../img/".ARG2."_".ARG1."_tk.png"
   set xrange [1:40]
