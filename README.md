@@ -89,18 +89,17 @@ Parallel runs using both MPI and OpenMP with:
 Number of proc. elements*threads < 32 (maximum number of cores in a Leonardo node in Booster).
 This hybrid approach is done in an "orthogonal" way, where the MPI and OpenMP cohexist by using buffers with increased sizes, indices depending on nPEs and number of threads, as well as on the processor rank and thread id, and making sure that the MPI calls are not done inside the OpenMP parallel region.  
 
-![Force Tasks/Threads](img/MPI_OpenMP_Force__108.png)
+![Force Tasks/Threads](img/MPI_OpenMPForce__108.png)
 
 In the case of the smallest system size (108), there is no real scaling in the Force computations timings normalized by their calls, since the timings are practically constant. This means that there would no speedup from increasing the number of npes or threads.
 
-![Force Tasks/Threads](img/MPI_OpenMP_Force__2916.png)
+![Force Tasks/Threads](img/MPI_OpenMPForce__2916.png)
+![Force Tasks/Threads](img/MPI_OpenMPForce__78732.png)
 
 However, by increasing the system size (2916), we see that there is a reduction in timing so a definite speedup, though there is no clear "best" combination of nPEs and number of threads.  
 
-![Force Tasks/Threads](img/MPI_OpenMP_Force__78732.png)
-
 This situation is replicated for the greatest size.
 
-![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__108.png)
-![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__2916.png)
-![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__78732.png)
+![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__108.png)
+![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__2916.png)
+![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__78732.png)
