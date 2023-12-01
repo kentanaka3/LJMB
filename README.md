@@ -70,10 +70,11 @@ Parallel runs with Open Multiprocessing implementation with:
 - Number of nodes: 1;
 - Number of processing elements: 1;
 - Number of threads: 2, 4, 6, 8, 16, 32.
-The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #endif* when -D LJMB_OPENMP=ON at compiling. Similarly to MPI, OpenMP divides the force computation among different threads, actually following an MPI-like hybrid approach:
+The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #endif* when -D LJMB_OPENMP=ON at compiling. Similarly to MPI, in the Force function OpenMP divides the force computation among different threads, actually following an MPI-like hybrid approach:
 - creation of a parallel region, with reduction for the sum of all energy potentials;  
 - each thread uses its own buffer pointers to hold full array of atoms, selected depending on the thread id, thus eliminating any race condition 
-- after the computation of forces by each thread, an *omp barrier* is raised to synchronize the results of forces computed from all threads and reduce them in a parallel way, dependent on the number of threads. This is still done on top of the Optimized version of the Force function. 
+- after the computation of forces by each thread, an *omp barrier* is raised to synchronize the results of forces computed from all threads and reduce them in a parallel way, dependent on the number of threads. This is still done on top of the Optimized version of the Force function.
+OpenMP *parallel for* is also applied to the loops inside the functions velverlet and velverlet_prop.  
 
 ![RunTime Size](img/OpenMP_RunTime_sz.png)
 ![RunTime Task](img/OpenMP_Force_tk.png)
@@ -94,9 +95,12 @@ In the case of the smallest system size (108), there is no real scaling in the F
 
 ![Force Tasks/Threads](img/MPI_OpenMP_Force__2916.png)
 
-However, by increasing the system size (2916),   
+However, by increasing the system size (2916), we see that there is a reduction in timing so a definite speedup, though there is no clear "best" combination of nPEs and number of threads.  
 
 ![Force Tasks/Threads](img/MPI_OpenMP_Force__78732.png)
+
+This situation is replicated for the greatest size.
+
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__108.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__2916.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__78732.png)
