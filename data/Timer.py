@@ -43,6 +43,8 @@ for arg in range(1, len(sys.argv)):
           if Timing[name][1] < a:
             Timing[name][1] = a
       M[key][z] = Timing
+
+  """
   if len(M.keys()) > 1:
     x = []
     y = []
@@ -62,7 +64,7 @@ for arg in range(1, len(sys.argv)):
         for i, j in enumerate(x):
           y[i] = M[a][j][t][1]/M[a][j][t][0]
           fr.write(str(j) + "\t" + str(y[i]) + "\n")
-    os.system(f"gnuplot -c Timer.plt {t} {sys.argv[arg]} \"{' '.join(M.keys())}\" Task")
+  """
 
   for a in M.keys():
     x = list(M[a].keys())
