@@ -1,5 +1,5 @@
 LJMD version 1.0
-Starting simulation with 108 atoms for 10000 steps.
+Starting simulation with 108 atoms for 10000 steps, nPEs = 1, Thds = 4.
 	NFI		TEMP		EKIN			EPOT			ETOT
        0          72.64160016          23.16879686        -160.48438434        -137.31558748
      100          65.43323663          20.86971328        -158.26635748        -137.39664420
@@ -112,7 +112,7 @@ KineticEnergy: 10000
 Propagate: 10000
 0 
 RunTime: 1
-517 
+554 
 Startup Time: 1
 3 
 Velverlet: 10000
