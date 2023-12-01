@@ -79,7 +79,9 @@ Parallel runs with:
 - Number of threads: 2, 4, 6, 8, 16, 32.
 Number of proc. elements*threads < 32 (maximum number of cores in a Leonardo node in Booster).
 
-![RunTime Size](img/MPI_OpenMP_RunTime_sz.png)
-![RunTime Task](img/MPI_OpenMP_Force_tk.png)
-![Force Size](img/MPI_OpenMP_Force_sz.png)
-![Force Task](img/MPI_OpenMP_Force_tk.png)
+![Force Tasks/Threads](img/MPI_OpenMP_Force__108.png)
+![Force Tasks/Threads](img/MPI_OpenMP_Force__2916.png)
+![Force Tasks/Threads](img/MPI_OpenMP_Force__78732.png)
+![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__108.png)
+![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__2916.png)
+![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime__78732.png)
