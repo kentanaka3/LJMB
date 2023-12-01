@@ -1,0 +1,4 @@
+LJMD version 1.0
+Starting simulation with 78732 atoms for 20 steps, nPEs = 4, Thds = 1.
+	NFI		TEMP		EKIN			EPOT			ETOT
+       0          71.96990686       16890.05291324     -122097.78543732     -105207.73252408
