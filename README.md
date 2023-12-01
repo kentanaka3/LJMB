@@ -31,16 +31,65 @@ The implemented test framework for the separated functions is GoogleTest. The sr
 
 ## Comparison
 # Serial
+Serial runs without optimizations.
 ![Run Time](img/RunTime.png)
 ![Force](img/Force.png)
 ![Velverlet](img/Velverlet.png)
 ![Propagate](img/Propagate.png)
 ![KineticEnergy](img/KineticEnergy.png)
 ![Start Up](img/StartupTime.png)
+
 # Optimized
+Serial runs with "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compiler flags and code optimizations (Newton's 3rd law, expensive math operations avoided).
+
+![RunTime Size](img/Optimized_RunTime_sz.png)
+![RunTime Task](img/Optimized_Force_tk.png)
+![Force Size](img/Optimized_Force_sz.png)
+![Force Task](img/Optimized_Force_tk.png)
+![Velverlet Size](img/Optimized_Velverlet_sz.png)
+![Velverlet Task](img/Optimized_Velverlet_tk.png)
+![Propagate Size](img/Optimized_Propagate_sz.png)
+![Propagate Task](img/Optimized_Propagate_tk.png)
+![Kinetic Energy Size](img/Optimized_KineticEnergy_sz.png)
+![Kinetic Energy Task](img/Optimized_Force_tk.png)
 
 # MPI
+Parallel runs with:
+- Number of Leonardo nodes: 1;
+- Number of processing elements: 2, 4, 8, 16, 32;
+- Number of threads: 1.
+
+![RunTime Size](img/MPI_RunTime_sz.png)
+![RunTime Task](img/MPI_Force_tk.png)
+![Force Size](img/MPI_Force_sz.png)
+![Force Task](img/MPI_Force_tk.png)
+![Velverlet Size](img/MPI_Velverlet_sz.png)
+![Velverlet Task](img/MPI_Velverlet_tk.png)
+![Propagate Size](img/MPI_Propagate_sz.png)
+![Propagate Task](img/MPI_Propagate_tk.png)
+![Kinetic Energy Size](img/MPI_KineticEnergy_sz.png)
+![Kinetic Energy Task](img/MPI_Force_tk.png)
 
 # OpenMP
+Parallel runs with:
+- Number of Leonardo nodes: 1;
+- Number of processing elements: 1;
+- Number of threads: 2, 4, 6, 8, 16, 32.
+
+![RunTime Size](img/OpenMP_RunTime_sz.png)
+![RunTime Task](img/OpenMP_Force_tk.png)
+![Force Size](img/OpenMP_Force_sz.png)
+![Force Task](img/OpenMP_Force_tk.png)
+![Velverlet Size](img/OpenMP_Velverlet_sz.png)
+![Velverlet Task](img/OpenMP_Velverlet_tk.png)
+![Propagate Size](img/OpenMP_Propagate_sz.png)
+![Propagate Task](img/OpenMP_Propagate_tk.png)
+![Kinetic Energy Size](img/OpenMP_KineticEnergy_sz.png)
+![Kinetic Energy Task](img/OpenMP_Force_tk.png)
 
 # MPI+OpenMP
+Parallel runs with: 
+- Number of Leonardo nodes: 1;
+- Number of processing elements: 2, 4, 6, 8, 16, 32;
+- Number of threads: 2, 4, 6, 8, 16, 32.
+maintaining npes*threads < 32 (number of cores in a Leonardo node)
