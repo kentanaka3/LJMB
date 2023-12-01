@@ -102,6 +102,8 @@ void initialize(mdsys_t * sys, char trajfile[], char ergfile[], int *nprint) {
   MPI_Bcast(&sys->nsteps, 1, MPI_INTEGER, 0, MPI_COMM_WORLD);
   MPI_Bcast(&sys->dt, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(nprint, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(trajfile, BLEN, MPI_CHAR, 0, MPI_COMM_WORLD);
+  MPI_Bcast(ergfile, BLEN, MPI_CHAR, 0, MPI_COMM_WORLD);
 
   MPI_Bcast(&sys->m, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(&sys->De, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);

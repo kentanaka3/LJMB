@@ -5,7 +5,7 @@ atom = re.compile( r"^Starting simulation with (?P<atoms>\d+)")
 z = 0
 m = re.compile(r"^(?P<name>\w+):\s(?P<calls>\d+)")
 n = re.compile(r"(\d+) *")
-o = re.compile(r"\d+_(?P<node>\d+)_(?P<tasks>\d+)_(?P<thread>\d+).out")
+o = re.compile(r"\d+_(?P<node>\d+)_(?P<tasks>\d+)_(?P<thread>\d+)")
 x = 0
 y = 0
 for arg in range(1, len(sys.argv)):
@@ -43,39 +43,90 @@ for arg in range(1, len(sys.argv)):
           if Timing[name][1] < a:
             Timing[name][1] = a
       M[key][z] = Timing
+
   if len(M.keys()) > 1:
-    x = []
-    y = []
-    z = []
+    x = set()
+    y = set()
+    z = set()
     for a in M.keys():
-      files = o.match(a)
-      if files:
-        x.append(int(files.group("node")))
-        y.append(int(files.group("tasks")))
-        z.append(int(files.group("thread")))
-    titles = [title for title in M[a][x[0]]]
-    for t in titles:
-      with open(os.path.join(pathname, t + a + "_tk.dat"), 'w') as fr:
-        fr.write("# " + t + "\n")
-    for t in titles:
-      with open(os.path.join(pathname, t + a + "_tk.dat"), 'a') as fr:
-        for i, j in enumerate(x):
-          y[i] = M[a][j][t][1]/M[a][j][t][0]
-          fr.write(str(j) + "\t" + str(y[i]) + "\n")
-    os.system(f"gnuplot -c Timer.plt {t} {sys.argv[arg]} \"{' '.join(M.keys())}\" Task")
+      files = a.split("_")
+      x.add(files[1])
+      y.add(files[2])
+      z.add(files[3])
+    if len(y) == 1:
+      # OpenMP
+      z = sorted(list(z))
+      for i in z:
+        a = "_".join(["", str(list(x)[0]), str(list(y)[0]), i])
+        for sz in M[a].keys():
+          for t in M[a][sz]:
+            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'w') as fr:
+              fr.write("# " + t + "\n")
+      for i in z:
+        a = "_".join(["", str(list(x)[0]), str(list(y)[0]), i])
+        for sz in M[a].keys():
+          for t in M[a][sz]:
+            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
+              fr.write(f"{i}\t{M[a][sz][t][1]/M[a][sz][t][0]}\n")
+              print(i, M[a][sz][t][1]/M[a][sz][t][0])
+    elif len(z) == 1:
+      # MPI
+      y = sorted(list(y))
+      for i in y:
+        a = "_".join(["", str(list(x)[0]), i, str(list(z)[0])])
+        for sz in M[a].keys():
+          for t in M[a][sz]:
+            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'w') as fr:
+              fr.write("# " + t + "\n")
+      for i in y:
+        a = "_".join(["", str(list(x)[0]), i, str(list(z)[0])])
+        for sz in M[a].keys():
+          for t in M[a][sz]:
+            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
+              fr.write(f"{i}\t{M[a][sz][t][1]/M[a][sz][t][0]}\n")
+              print(i, M[a][sz][t][1]/M[a][sz][t][0])
+    else:
+      # MPI + OpenMP
+      y = sorted(list(y))
+      z = sorted(list(z))
+      for i in y:
+        for j in z:
+          a = "_".join(["", str(list(x)[0]), i, j])
+          if a in M:
+            for sz in M[a].keys():
+              for t in M[a][sz]:
+                with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'w') as fr:
+                  fr.write("")
+      for i in y:
+        for j in z:
+          a = "_".join(["", str(list(x)[0]), i, j])
+          if a in M:
+            for sz in M[a].keys():
+              for t in M[a][sz]:
+                with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
+                  fr.write(f"{M[a][sz][t][1]/M[a][sz][t][0]}\t")
+                  print(i, j, M[a][sz][t][1]/M[a][sz][t][0])
+          else:
+            a = "_".join(["", str(list(x)[0]), i, z[0]])
+            for sz in M[a].keys():
+              for t in M[a][sz]:
+                with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
+                  fr.write(f"NaN\t")
+        a = "_".join(["", str(list(x)[0]), i, z[0]])
+        for sz in M[a].keys():
+          for t in M[a][sz]:
+            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
+              fr.write(f"\n")
+
 
   for a in M.keys():
     x = list(M[a].keys())
     y = [0]*len(x)
-    titles = [title for title in M[a][x[0]]]
-    for t in titles:
+    for t in M[a][x[0]]:
       with open(os.path.join(pathname, t + a + "_sz.dat"), 'w') as fr:
         fr.write("# " + t + "\n")
-    for t in titles:
+    for t in M[a][x[0]]:
       with open(os.path.join(pathname, t + a + "_sz.dat"), 'a') as fr:
         for i, j in enumerate(x):
           y[i] = M[a][j][t][1]/M[a][j][t][0]
           fr.write(str(j) + "\t" + str(y[i]) + "\n")
-
-  for t in titles:
-    os.system(f"gnuplot -c Timer.plt {t} {sys.argv[arg]} \"{' '.join(M.keys())}\" Size")
