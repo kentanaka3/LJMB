@@ -16,6 +16,16 @@ plot:
 	gnuplot -c SerialComp.plt Propagate "Serial Optimization"
 	gnuplot -c SerialComp.plt RunTime "Serial Optimization"
 	gnuplot -c SerialComp.plt Velverlet "Serial Optimization"
+	gnuplot -c Timer.plt Force "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01" Size
+	gnuplot -c Timer.plt KineticEnergy "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01" Size
+	gnuplot -c Timer.plt Propagate "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01" Size
+	gnuplot -c Timer.plt RunTime "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01" Size
+	gnuplot -c Timer.plt Velverlet "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01" Size
+	gnuplot -c Timer.plt Force "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
+	gnuplot -c Timer.plt KineticEnergy "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
+	gnuplot -c Timer.plt Propagate "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
+	gnuplot -c Timer.plt RunTime "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
+	gnuplot -c Timer.plt Velverlet "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
 clean:
 	rm -f *.dat
 	rm -f *.xyz
