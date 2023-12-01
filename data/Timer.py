@@ -85,22 +85,39 @@ for arg in range(1, len(sys.argv)):
             with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
               fr.write(f"{i}\t{M[a][sz][t][1]/M[a][sz][t][0]}\n")
               print(i, M[a][sz][t][1]/M[a][sz][t][0])
-
     else:
       # MPI + OpenMP
+      y = sorted(list(y))
+      z = sorted(list(z))
       for i in y:
         for j in z:
-          a = "_".join(["", x[0], i, j])
-    """
-    for t in titles:
-      with open(os.path.join(pathname, t + a + "_tk.dat"), 'w') as fr:
-        fr.write("# " + t + "\n")
-    for t in titles:
-      with open(os.path.join(pathname, t + a + "_tk.dat"), 'a') as fr:
-        for i, j in enumerate(x):
-          y[i] = M[a][j][t][1]/M[a][j][t][0]
-          fr.write(str(j) + "\t" + str(y[i]) + "\n")
-    """
+          a = "_".join(["", str(list(x)[0]), i, j])
+          if a in M:
+            for sz in M[a].keys():
+              for t in M[a][sz]:
+                with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'w') as fr:
+                  fr.write("")
+      for i in y:
+        for j in z:
+          a = "_".join(["", str(list(x)[0]), i, j])
+          if a in M:
+            for sz in M[a].keys():
+              for t in M[a][sz]:
+                with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
+                  fr.write(f"{M[a][sz][t][1]/M[a][sz][t][0]}\t")
+                  print(i, j, M[a][sz][t][1]/M[a][sz][t][0])
+          else:
+            a = "_".join(["", str(list(x)[0]), i, z[0]])
+            for sz in M[a].keys():
+              for t in M[a][sz]:
+                with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
+                  fr.write(f"NaN\t")
+        a = "_".join(["", str(list(x)[0]), i, z[0]])
+        for sz in M[a].keys():
+          for t in M[a][sz]:
+            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
+              fr.write(f"\n")
+
 
   for a in M.keys():
     x = list(M[a].keys())
