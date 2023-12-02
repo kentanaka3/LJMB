@@ -31,15 +31,20 @@ A simple Lennard-Jones Many-Body (LJMB) Simulator Optimization and Parallelizati
         ├── test_utils.cpp
         └── test_verlet.cpp
 
-## Running
-In order to compile in LJMB folder, we use the following CMake command:
+## Compilation
+In order to enable compilation process in LJMB folder, we use the following CMake command:
 
-```$ cmake -S . -B build -DLJMD_MPI=ON -DLJMD_OPENMP=ON```
+```$ cmake -S . -B build -DLJMD_MPI=ON -DLJMD_OPENMP=ON -DTEST=ON```
 
 For compiler optimization flags, add:
 
 ```-DCMAKE_CXX_FLAGS="-O3 -Wall -ffast-math -fexpensive-optimizations -msse3"```
 
+We build the executable by compiling with CMake with the following command:
+
+```$ cmake --build build```
+
+## Running
 As the executable expects to recieve *input* information from the command line and search for other files such as *rest*, it is imperative to navigate to the *data* folder.
 
 We specify the number of Open Multi-Processing (OpenMP) elements with the following command.
@@ -95,13 +100,11 @@ The *gprof* profiler of the Optimized version clearly shows that the majority of
  **Call graph**
 
 
-*index|% time|self|children|name*
-
-1|63.9|1.22|0.00|force
-
-2|30.4|0.58|0.00|pbc 
-
-3|5.2|0.10|0.00|azzero 
+| index |  time  | self | children |  name |
+|:-----:|:------:|:----:|:--------:|:-----:|
+|     1 |   63.9 |  1.22|     0.00 | force |
+|     2 |   30.4 |  0.58|     0.00 | pbc   |
+|     3 |   5.2  |  0.10|     0.00 | azzero|
 
 which explains why is it important to improve the speedup by parallelization of the Force function itself, as explained in the following paragraphs.
 
