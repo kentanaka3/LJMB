@@ -8,7 +8,7 @@ A simple Lennard-Jones Many-Body (LJMB) Simulator Optimization and Parallelizati
 ## Running
 Compile with cmake -S . -B build -D LJMD_MPI=ON -D LJMD_OPENMP=ON; for compiler optimization flags, add -DCMAKE_CXX_FLAGS="-O3 -Wall -ffast-math -fexpensive-optimizations -msse3".
 From command line, while in LJMB/data folder:
-1) export export OMP_NUM_THREADS=<n. threads>
+1) export OMP_NUM_THREADS=<n. threads>
 2) mpirun --bind-to-socket -np <n. processing elements> ../build/MAIN.x < <chosen .inp file> 
 Input .inp and .rest files, output .dat and .xyz files can be found in LJMB/data; simulation outputs can be compared with references in LJMB/data/refs folder. Input files contain the physical parameters to start the simulation for 108, 2916 and 78732 atoms of argon in liquid state.  
 
@@ -75,19 +75,24 @@ The MPI code parts are activated by *#ifdef MY_MPI [...] #endif*, set by -D LJMB
 - and finally reducing the forces computed by all processes and the total energy potential back into rank 0 process. This is done on top of the already implemented Optimized code.
 
 ![Force Size](img/MPI_Force_sz.png)
-![Force Task](img/MPI_Force_tk.png)
 ![RunTime Size](img/MPI_RunTime_sz.png)
+
+The Force and RunTime timings by size show that there is an increase in 
+
+![Force Task](img/MPI_Force_tk.png)
 ![RunTime Task](img/MPI_RunTime_tk.png)
+
+The timings by increasing number of processing elements or tasks (nPEs) are, as expected, decreasing with the increase in the number of nPEs; also as expected, the times increase with the size of the simulation. 
 
 ![Force Speedup](img/MPI_Force_sp.png)
 ![RunTime Speedup](img/MPI_RunTime_sp.png)
-The speedup over serial timings is definetively evident while performing the simulation with the two biggest sizes 
+The speedups over serial timings show a positive trend in any number   
 
 ### OpenMP
 Parallel runs with Open Multiprocessing implementation with:
 - Number of nodes: 1;
 - Number of processing elements: 1;
-- Number of threads: 2, 4, 6, 8, 16, 32.
+- Number of threads: 2, 4, 8, 16, 32.
 The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #endif* when -D LJMB_OPENMP=ON at compiling. Similarly to MPI, in the Force function OpenMP divides the force computation among different threads, actually following an MPI-like hybrid approach:
 - creation of a parallel region, with reduction for the sum of all energy potentials;  
 - each thread uses its own buffer pointers to hold full array of atoms, selected depending on the thread id, thus eliminating any race condition 
@@ -95,8 +100,9 @@ The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #
 OpenMP *parallel for* is also applied to the loops inside the functions velverlet and velverlet_prop.  
 
 ![Force Size](img/OpenMP_Force_sz.png)
-![Force Task](img/OpenMP_Force_tk.png)
 ![RunTime Size](img/OpenMP_RunTime_sz.png)
+
+![Force Task](img/OpenMP_Force_tk.png)
 ![RunTime Task](img/OpenMP_RunTime_tk.png)
 
 ![Force Speedup](img/OpenMP_Force_sp.png)
@@ -105,8 +111,8 @@ OpenMP *parallel for* is also applied to the loops inside the functions velverle
 ### MPI+OpenMP
 Parallel runs using both MPI and OpenMP with: 
 - Number of nodes: 1;
-- Number of processing elements: 2, 4, 6, 8, 16, 32;
-- Number of threads: 2, 4, 6, 8, 16, 32.
+- Number of processing elements: 2, 4, 8, 16, 32;
+- Number of threads: 2, 4, 8, 16, 32.
 Number of proc. elements*threads < 32 (maximum number of cores in a Leonardo node in Booster).
 This hybrid approach is done in an "orthogonal" way, where the MPI and OpenMP cohexist by using buffers with increased sizes, indices depending on nPEs and number of threads, as well as on the processor rank and thread id, and making sure that the MPI calls are not done inside the OpenMP parallel region.
 We used heatmaps, one for each simulation size, to display the timings of all possible nPEs-nthreads combinations:  
@@ -124,4 +130,11 @@ However, by increasing the system size (2916, 78732), we see that there is a red
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_2916.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_78732.png)
 
-Similar results can be seen considering the whole RunTime timings for the combinations; however, in the case of the 108 size simultion, we observe that there is not actually a speedup with the most performant nPEs-nthreads combinations, but a slowdown, so we can consider those cases of weak scalarity.
+Similar results can be seen while considering the whole RunTime timings for the combinations; however, in the case of the 108 size simultion, we observe that there is not actually a speedup with the most performant nPEs-nthreads combinations, but a slowdown, so we can consider those cases a form of weak scalarity.
+
+This is particularly evident if we compare the speedups of the three system sizes while scaling with the number of nodes, considering that each node has 32 cores: 
+
+![Force Nodes](img/MPI_OpenMPForce_nodes.png)
+![RunTime Nodes](img/MPI_OpenMPRunTime_nodes.png)
+
+We observe that the simulation with size 78732 has good scalability, quite reaching the ideal speedup, while the 2916-sized one shows a distinct plateau in times after 128 tasks in 4 nodes. Meanwhile, the simulation with 108 atoms confirms a decrease in timings, thus a very weak scalability with nodes. This means that the system can reach strong levels of scalability only for problems with size of magnitude comparable to 78732, or probably larger than that.   
