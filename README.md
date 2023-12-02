@@ -41,33 +41,27 @@ We performed a series of benchmarks on the Leonardo HPC supercomputer hosted by 
 These benchmarks consider the timings and number of calls, depending on the simulation sizes (108, 2916, 78732 atoms) for the Force, Velverlet, Propagate, Kinetic Energy computation functions, as well as the total Run Time, under several configurations of number of processing elements (cores), number of threads, and number of nodes. 
 
 ### Serial vs. Optimized
-Serial runs without optimizations are profiled using the gprof command:
-
-		     Call graph (explanation follows)
-
-
-granularity: each sample hit covers 2 byte(s) for 0.52% of 1.91 seconds
-
-index % time    self  children    called     name
-                                                 <spontaneous>
-[1]     63.9    1.22    0.00                 force [1]
------------------------------------------------
-                                                 <spontaneous>
-[2]     30.4    0.58    0.00                 pbc [2]
------------------------------------------------
-                                                 <spontaneous>
-[3]      5.2    0.10    0.00                 azzero [3]
------------------------------------------------
-
-which clearly shows that the majority of spent execution time (63.9%) is due to the Force function. 
-
-The Force timing and total RunTime of the serial version are here compared against runs with an Optimized version of the program. The latter uses "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compiler flags and code optimizations, in particular the application of Newton's 3rd law for Forces computation (in comp.c function) and avoiding time expensive math functions like pow(), sqrt(), division. 
+The Force function timing and total RunTime of the serial version are here compared against runs with an Optimized version of the program. The latter uses "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compiler flags and code optimizations, in particular the application of Newton's 3rd law for Forces computation (in comp.c function) and avoiding time expensive math functions like pow(), sqrt(), division. 
 However, these optimizations determine a known floating point divergence between the simulation results and the reference datasets, which is especially evident using 108 atoms for the simulation.  
 
 ![Serial vs Optimized Force](img/SerialComp_Force_sz.png)
 ![Serial vs Optimized RunTime](img/SerialComp_RunTime_sz.png)
 
 The optimizations, as expected, determine speedups in the execution of the Force computation time.
+The *gprof* profiler of the Optimized version clearly shows that the majority of timing is due to the Force function (63.9 %):
+
+ **Call graph (explanation follows)**
+
+
+**granularity: each sample hit covers 2 byte(s) for 0.52% of 1.91 seconds**
+
+*index  % time    self    children    called     name*
+
+1         63.9    1.22        0.00              force 
+2         30.4    0.58        0.00                pbc 
+3          5.2    0.10        0.00             azzero 
+
+which explains why is it important to improve the speedup by parallelization of the Force function itself, as explained in the following paragraphs.
 
 ### MPI
 Parallel runs by Message Passing Interface implementation with:
@@ -78,12 +72,16 @@ The MPI code parts are activated by *#ifdef MY_MPI [...] #endif*, set by -D LJMB
 - broadcasting the position of atoms among processes
 - creating indices employed by loop control flows dependent on the number of processes and their ranks,
 - using dedicated buffers for the storage of computed forces 
-- and finally reducing the forces computed by all processes and the total energy potential back into rank 0 process. This is done on top of the already implemented Optimized code.  
+- and finally reducing the forces computed by all processes and the total energy potential back into rank 0 process. This is done on top of the already implemented Optimized code.
 
-![RunTime Size](img/MPI_RunTime_sz.png)
-![RunTime Task](img/MPI_Force_tk.png)
 ![Force Size](img/MPI_Force_sz.png)
 ![Force Task](img/MPI_Force_tk.png)
+![RunTime Size](img/MPI_RunTime_sz.png)
+![RunTime Task](img/MPI_RunTime_tk.png)
+
+![Force Speedup](img/MPI_Force_sp.png)
+![RunTime Speedup](img/MPI_RunTime_sp.png)
+The speedup over serial timings is definetively evident while performing the simulation with the two biggest sizes 
 
 ### OpenMP
 Parallel runs with Open Multiprocessing implementation with:
@@ -97,7 +95,7 @@ The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #
 OpenMP *parallel for* is also applied to the loops inside the functions velverlet and velverlet_prop.  
 
 ![RunTime Size](img/OpenMP_RunTime_sz.png)
-![RunTime Task](img/OpenMP_Force_tk.png)
+![RunTime Task](img/OpenMP_RunTime_tk.png)
 ![Force Size](img/OpenMP_Force_sz.png)
 ![Force Task](img/OpenMP_Force_tk.png)
 
@@ -111,13 +109,15 @@ This hybrid approach is done in an "orthogonal" way, where the MPI and OpenMP co
 
 ![Force Tasks/Threads](img/MPI_OpenMPForce__108.png)
 
-In the case of the smallest system size (108), there is no real scaling in the Force computations timings normalized by their calls, since the timings are practically constant. This means that there would no speedup from increasing the number of npes or threads.
+In the case of the smallest system size (108), there is no real scaling in the Force computations timings normalized by their calls, since the timings are practically constant.
 
 ![Force Tasks/Threads](img/MPI_OpenMPForce__2916.png)
 ![Force Tasks/Threads](img/MPI_OpenMPForce__78732.png)
 
-However, by increasing the system size (2916, 78732), we see that there is a reduction in timing so a definite speedup, though there is no clear best combination of nPEs and number of threads.  
+However, by increasing the system size (2916, 78732), we see that there is a reduction in timing, though there is not a clear "best" way to parallelize: all nPEs/nthreads combinations who fully exploit the cores in the node (i.e., nPEs*nthreads = 32) have generally similar timings, even at the biggest problem size (78732). A balanced combination within the node for size = 78732, according to the heatmap, would be nPEs = 8 and nthreads = 4, but by a small margin over the other competing combinations. This is probably due to the Leonardo system being a well balanced one, where its limits due to memory would be reached only with an even bigger simulation size.    
 
 ![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__108.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__2916.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__78732.png)
+
+Similar results can be seen considering the whole RunTime timings for the combinations; however, some timing reductions can be observed here at the 108 size, though the number of  
