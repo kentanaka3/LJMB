@@ -1,13 +1,13 @@
-set term png size 600,500
+set term png size 700,600
 set xlabel "Tasks"
 set ylabel "Threads"
 set clabel "Time"
-set xrange [-0.5:3.5]
+set xrange [-0.5:4.5]
 set size square
-set xtics("2" 0, "4" 1, "8" 2, "16" 3)
-set yrange [-0.5:3.5] reverse
+set xtics("2" 0, "4" 1, "8" 2, "16" 3, "32" 4)
+set yrange [-0.5:4.5] reverse
 set palette negative
-set ytics("2" 0, "4" 1, "8" 2, "16" 3)
+set ytics("2" 0, "4" 1, "8" 2, "16" 3, "32" 4)
 do for [i=1:words(ARG1)] {
   do for [j=1:words(ARG2)] {
     set title word(ARG1, i).", Size: ".substr(word(ARG2, j), 2, strlen(word(ARG2, j)))

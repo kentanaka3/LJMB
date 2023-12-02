@@ -9,6 +9,7 @@ organize:
 	mv *_01_01_*.out Timer/OpenMP
 	mv *_01_*_01.out Timer/MPI
 	mv *_01_*_*.out Timer/MPI_OpenMP
+	mv *_*_01_01.out Timer/Optimization
 	rm *.err
 plot:
 	gnuplot -c SerialComp.plt Force "Serial Optimization"
