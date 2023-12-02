@@ -18,6 +18,7 @@ plot:
 	gnuplot -c Timer.plt RunTime "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01" Size
 	gnuplot -c Timer.plt Force "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
 	gnuplot -c Timer.plt RunTime "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
+	gnuplot -c Timer.plt Velverlet "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" Size
 	gnuplot -c Timer.plt Force "MPI" "_108 _2916 _78732" Task
 	gnuplot -c Timer.plt RunTime "MPI" "_108 _2916 _78732" Task
 	gnuplot -c Timer.plt Force "OpenMP" "_108 _2916 _78732" Task
