@@ -41,8 +41,28 @@ We performed a series of benchmarks on the Leonardo HPC supercomputer hosted by 
 These benchmarks consider the timings and number of calls, depending on the simulation sizes (108, 2916, 78732 atoms) for the Force, Velverlet, Propagate, Kinetic Energy computation functions, as well as the total Run Time, under several configurations of number of processing elements (cores), number of threads, and number of nodes. 
 
 ### Serial vs. Optimized
-Serial runs without optimizations are here compared against analog runs with "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compiler flags and code optimizations: specifically,the application of Newton's 3rd law for Forces computation (in comp.c function) and avoiding time expensive math functions like pow(), sqrt(), division. 
-However, these optimizations determine a known floating point divergence between the simulation results and the reference datasets, which is especially evident using 108 atoms for the simulation size.  
+Serial runs without optimizations are profiled using the gprof command:
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) for 0.52% of 1.91 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     63.9    1.22    0.00                 force [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[2]     30.4    0.58    0.00                 pbc [2]
+-----------------------------------------------
+                                                 <spontaneous>
+[3]      5.2    0.10    0.00                 azzero [3]
+-----------------------------------------------
+
+which clearly shows that the majority of spent execution time (63.9%) is due to the Force function. 
+
+The Force timing and total RunTime of the serial version are here compared against runs with an Optimized version of the program. The latter uses "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compiler flags and code optimizations, in particular the application of Newton's 3rd law for Forces computation (in comp.c function) and avoiding time expensive math functions like pow(), sqrt(), division. 
+However, these optimizations determine a known floating point divergence between the simulation results and the reference datasets, which is especially evident using 108 atoms for the simulation.  
 
 ![Serial vs Optimized Force](img/SerialComp_Force_sz.png)
 ![Serial vs Optimized RunTime](img/SerialComp_RunTime_sz.png)
@@ -96,9 +116,7 @@ In the case of the smallest system size (108), there is no real scaling in the F
 ![Force Tasks/Threads](img/MPI_OpenMPForce__2916.png)
 ![Force Tasks/Threads](img/MPI_OpenMPForce__78732.png)
 
-However, by increasing the system size (2916), we see that there is a reduction in timing so a definite speedup, though there is no clear "best" combination of nPEs and number of threads.  
-
-This situation is replicated for the greatest size.
+However, by increasing the system size (2916, 78732), we see that there is a reduction in timing so a definite speedup, though there is no clear best combination of nPEs and number of threads.  
 
 ![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__108.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__2916.png)
