@@ -1,12 +1,11 @@
 set term png size 300,300
 set ylabel "Speedup"
-set xlabel "# Nodes (nPEs = 8, nthreads = 4)"
+set xlabel "# Tasks"
 set print
 set size square
 set key top left
 array Serial[words(ARG2)]
-set xrange [1:35]
-set yrange [1:35]
+set xrange [32:256]
 do for [i=1:words(ARG1)] {
   print word(ARG1, i)
   do for [j=1:words(ARG2)] {
@@ -15,8 +14,8 @@ do for [i=1:words(ARG1)] {
     print Serial[j]
   }
   set title word(ARG1, i)
-  set output "../img/MPI_OpenMP".word(ARG1, i)."_sp.png"
-  plot for [j=1:words(ARG2)] "Timer/Nodes/".word(ARG1, i).word(ARG2, j)."_tk.dat" \
+  set output "../img/MPI_OpenMP".word(ARG1, i)."_nodes.png"
+  plot for [j=1:words(ARG2)] "Timer/Nodes/".word(ARG1, i)."_nodes".word(ARG2, j)."_tk.dat" \
        u 1:(Serial[j]/$2) w lp title substr(word(ARG2, j), 2, strlen(word(ARG2, j))), \
        x
 }
