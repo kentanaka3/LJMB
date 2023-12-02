@@ -50,18 +50,16 @@ However, these optimizations determine a known floating point divergence between
 The optimizations, as expected, determine speedups in the execution of the Force computation time.
 The *gprof* profiler of the Optimized version clearly shows that the majority of timing is due to the Force function (63.9 %):
 
- **Call graph (explanation follows)**
+ **Call graph**
 
 
-**granularity: each sample hit covers 2 byte(s) for 0.52% of 1.91 seconds**
+*index|% time|self|children|name*
 
-*index|% time|self|children|called|name*
+1|63.9|1.22|0.00|force
 
-1|63.9|1.22|0.00| |force
+2|30.4|0.58|0.00|pbc 
 
-2|30.4|0.58|0.00| |pbc 
-
-3|5.2|0.10|0.00| |azzero 
+3|5.2|0.10|0.00|azzero 
 
 which explains why is it important to improve the speedup by parallelization of the Force function itself, as explained in the following paragraphs.
 
@@ -110,7 +108,8 @@ Parallel runs using both MPI and OpenMP with:
 - Number of processing elements: 2, 4, 6, 8, 16, 32;
 - Number of threads: 2, 4, 6, 8, 16, 32.
 Number of proc. elements*threads < 32 (maximum number of cores in a Leonardo node in Booster).
-This hybrid approach is done in an "orthogonal" way, where the MPI and OpenMP cohexist by using buffers with increased sizes, indices depending on nPEs and number of threads, as well as on the processor rank and thread id, and making sure that the MPI calls are not done inside the OpenMP parallel region.  
+This hybrid approach is done in an "orthogonal" way, where the MPI and OpenMP cohexist by using buffers with increased sizes, indices depending on nPEs and number of threads, as well as on the processor rank and thread id, and making sure that the MPI calls are not done inside the OpenMP parallel region.
+We used heatmaps, one for each simulation size, to display the timings of all possible nPEs-nthreads combinations:  
 
 ![Force Tasks/Threads](img/MPI_OpenMP_Force_108.png)
 
@@ -125,4 +124,4 @@ However, by increasing the system size (2916, 78732), we see that there is a red
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_2916.png)
 ![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_78732.png)
 
-Similar results can be seen considering the whole RunTime timings for the combinations; however, some timing reductions can be observed here at the 108 size, though the number of  
+Similar results can be seen considering the whole RunTime timings for the combinations; however, in the case of the 108 size simultion, we observe that there is not actually a speedup with the most performant nPEs-nthreads combinations, but a slowdown, so we can consider those cases of weak scalarity.
