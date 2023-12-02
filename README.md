@@ -1,16 +1,58 @@
 # LJMB
 A simple Lennard-Jones Many-Body (LJMB) Simulator Optimization and Parallelization
 
-- Andrea -> openmp
-- Fathi  -> mpi
-- Ken    -> optimization
+- Andrea -> PpenMP
+- Fathi  -> MPI
+- Ken    -> Optimization
+
+## Filesystem
+
+    LJMB/
+    ├── CMakeLists.txt
+    ├── data/
+    │   ├── argon_108.inp
+    │   ├── argon_2916.inp
+    │   ├── argon_78732.inp
+    │   └── ...
+    ├── doc/
+    │   └── Assignment.pdf
+    ├── img/
+    │   └── ...
+    ├── inc/
+    │   └── ..
+    ├── Makefile
+    ├── README.md
+    ├── src/
+    │   ├── .old/
+    │   │   └── ljmd.c
+    │   └── ...
+    └── test/
+        ├── test_comp.cpp
+        ├── test_utils.cpp
+        └── test_verlet.cpp
 
 ## Running
-Compile with cmake -S . -B build -D LJMD_MPI=ON -D LJMD_OPENMP=ON; for compiler optimization flags, add -DCMAKE_CXX_FLAGS="-O3 -Wall -ffast-math -fexpensive-optimizations -msse3".
-From command line, while in LJMB/data folder:
-1) export export OMP_NUM_THREADS=<n. threads>
-2) mpirun --bind-to-socket -np <n. processing elements> ../build/MAIN.x < <chosen .inp file> 
-Input .inp and .rest files, output .dat and .xyz files can be found in LJMB/data; simulation outputs can be compared with references in LJMB/data/refs folder. Input files contain the physical parameters to start the simulation for 108, 2916 and 78732 atoms of argon in liquid state.  
+In order to compile in LJMB folder, we use the following CMake command:
+
+```$ cmake -S . -B build -DLJMD_MPI=ON -DLJMD_OPENMP=ON```
+
+For compiler optimization flags, add:
+
+```-DCMAKE_CXX_FLAGS="-O3 -Wall -ffast-math -fexpensive-optimizations -msse3"```
+
+As the executable expects to recieve *input* information from the command line and search for other files such as *rest*, it is imperative to navigate to the *data* folder.
+
+We specify the number of Open Multi-Processing (OpenMP) elements with the following command.
+
+```$ export OMP_NUM_THREADS=<threads>```
+
+It is highly suggested to know the number of threads the machine can handle to avoid any Hyperthreading activity which might cause the executable to run much slower than serial.
+
+We run the executable by specify the number of Message Passing Interface (MPI) elements with the following command.
+
+```$ mpirun --bind-to-socket -np <nPEs> ../build/MAIN.x < <input_file.inp>```
+
+Simulation outputs can be compared with references in LJMB/data/refs folder. Input files contain the physical parameters to start the simulation for 108, 2916 and 78732 atoms of argon in liquid state.  
 
 ## Functions
 Splitted functions source files are in LJMD/src:
