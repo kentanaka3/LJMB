@@ -6,42 +6,45 @@ A simple Lennard-Jones Many-Body (LJMB) Simulator Optimization and Parallelizati
 - Ken    -> optimization
 
 ## Running
-Compile with cmake -S . -B build -D LJMD_MPI=ON -D LJMD_OPENMP=ON; for compiler optimization flags, add -DCMAKE_CXX_FLAGS="-O3 -Wall -ffast-math -fexpensive-optimizations -msse3".
+Compile with:
+ 1) *cmake -S . -B build -D LJMD_MPI=ON -D LJMD_OPENMP=ON;*
+ 2) *cmake --build --build*
+ for compiler optimization flags, add *-DCMAKE_CXX_FLAGS="-O3 -Wall -ffast-math -fexpensive-optimizations -msse3"*.
 From command line, while in LJMB/data folder:
-1) export OMP_NUM_THREADS=<n. threads>
-2) mpirun --bind-to-socket -np <n. processing elements> ../build/MAIN.x < <chosen .inp file> 
+1) *export OMP_NUM_THREADS=<n. threads>*
+2) *mpirun --bind-to-socket -np <n. processing elements> ../build/MAIN.x < <chosen .inp file>* 
 Input .inp and .rest files, output .dat and .xyz files can be found in LJMB/data; simulation outputs can be compared with references in LJMB/data/refs folder. Input files contain the physical parameters to start the simulation for 108, 2916 and 78732 atoms of argon in liquid state.  
 
 ## Functions
 Splitted functions source files are in LJMD/src:
-- main.cpp: main function
-- init.c: initialize -> reading input files and restart, memory allocation
-- comp.c: ekin -> kinetic energy computation; force -> forces computation
-- verlet.c: velverlet -> velocity propagation by half, position by a full step; velverlet_prop -> propagate velocities by another half step 
-- utils.c: azzero -> array gets all elements zeroed; helper -> apply minimum image convention; get_a_line: reads a line from a file and cuts away blank spaces and comments
-- output.c: output -> append data to output file
-- cleanup.c: cleanup -> close files, free allocated memory.
+- *main.cpp*: main function
+- *init.c*: initialize -> reading input files and restart, memory allocation
+- *comp.c*: ekin -> kinetic energy computation; force -> forces computation
+- *verlet.c*: velverlet -> velocity propagation by half, position by a full step; velverlet_prop -> propagate velocities by another half step 
+- *utils.c*: azzero -> array gets all elements zeroed; helper -> apply minimum image convention; get_a_line: reads a line from a file and cuts away blank spaces and comments
+- *output.c*: output -> append data to output file
+- *cleanup.c*: cleanup -> close files, free allocated memory.
 
 ## Headers and auxiliary files
 Headers and auxiliary files are in LJMD/inc:
-- structs.c: physical constants which are used during computation
-- Timer.hpp: functions for measuring and printing time results
-- myMPI.hpp: MPI variables
-- init.h, comp.h, verlet.h, utils.h, output.h, cleanup.h: prototypes for the respective functions.
+- *structs.c*: physical constants which are used during computation
+- *Timer.hpp*: functions for measuring and printing time results
+- *myMPI.hpp*: MPI variables
+- *init.h, comp.h, verlet.h, utils.h, output.h, cleanup.h*: prototypes for the respective functions.
 The headers and auxiliary files are built by the compiler into a mdlib library.
 
 ## Implemented tests
 The implemented test framework for the separated functions is GoogleTest. The src files used for compiling are in LJMB/test. After compiling, the tests executables can be found in LJMB/build. All tests are executed on 2 particles:
-- test_comp -> testing ekin, force functions
-- test_utils -> testing azzero, pbc functions 
-- test_verlet -> testing velverlet, velverlet_prop functions
+- *test_comp* -> testing ekin, force functions
+- *test_utils* -> testing azzero, pbc functions 
+- *test_verlet* -> testing velverlet, velverlet_prop functions
 
 ## Benchmarks
 We performed a series of benchmarks on the Leonardo HPC supercomputer hosted by CINECA, using the Booster partition with 32 cores per node. 
-These benchmarks consider the timings and number of calls, depending on the simulation sizes (108, 2916, 78732 atoms) for the Force, Velverlet, Propagate, Kinetic Energy computation functions, as well as the total Run Time, under several configurations of number of processing elements (cores), number of threads, and number of nodes. 
+These benchmarks consider the timings and number of calls, depending on the simulation sizes (108, 2916, 78732 atoms) for the Force, Velverlet, Propagate, Kinetic Energy computation functions, as well as the total Run Time, under several configurations of number of processing elements (cores), number of threads, and number of nodes. The following plots show the timings for each call specifically of the Force function and RunTime.
 
 ### Serial vs. Optimized
-The Force function timing and total RunTime of the serial version are here compared against runs with an Optimized version of the program. The latter uses "-O3 -Wall -ffast-math -fexpensive-optimizations -msse3" compiler flags and code optimizations, in particular the application of Newton's 3rd law for Forces computation (in comp.c function) and avoiding time expensive math functions like pow(), sqrt(), division. 
+The Force function timing and total RunTime of the serial version are here compared against runs with an Optimized version of the program. The latter uses *"-O3 -Wall -ffast-math -fexpensive-optimizations -msse3"* compiler flags and code optimizations, in particular the application of Newton's 3rd law for Forces computation (in comp.c function) and avoiding time expensive math functions like pow(), sqrt(), division. 
 However, these optimizations determine a known floating point divergence between the simulation results and the reference datasets, which is especially evident using 108 atoms for the simulation.  
 
 ![Serial vs Optimized Force](img/SerialComp_Force_sz.png)
@@ -77,19 +80,19 @@ The MPI code parts are activated by *#ifdef MY_MPI [...] #endif*, set by -D LJMB
 ![Force Size](img/MPI_Force_sz.png)
 ![RunTime Size](img/MPI_RunTime_sz.png)
 
-The Force and RunTime timings by size show that there is an increase in 
+The Force and RunTime timings by size show increments depending on the simulation size, as expected. 
 
 ![Force Task](img/MPI_Force_tk.png)
 ![RunTime Task](img/MPI_RunTime_tk.png)
 
-The timings by increasing number of processing elements or tasks (nPEs) are, as expected, decreasing with the increase in the number of nPEs; also as expected, the times increase with the size of the simulation. 
+The timings by increasing number of processing elements or tasks (nPEs) are decreasing with the increase in the number of nPEs; besides, the times increase with the size of the simulation. However, the smallest simulation (108) has practically constant timings while increasing the number of tasks.
 
 ![Force Speedup](img/MPI_Force_sp.png)
 ![RunTime Speedup](img/MPI_RunTime_sp.png)
-The speedups over serial timings show a positive trend in any number   
+The speedup over serial timings plots show a strong scalability for the largest simulation size (78732), while the smallest one soon reaches a plateau with weak scalability.   
 
 ### OpenMP
-Parallel runs with Open Multiprocessing implementation with:
+Parallel runs with Open MultiProcessing implementation with:
 - Number of nodes: 1;
 - Number of processing elements: 1;
 - Number of threads: 2, 4, 8, 16, 32.
@@ -102,11 +105,17 @@ OpenMP *parallel for* is also applied to the loops inside the functions velverle
 ![Force Size](img/OpenMP_Force_sz.png)
 ![RunTime Size](img/OpenMP_RunTime_sz.png)
 
+The timings depending on simulation sizes for OpenMP show a similar trend to the ones produced under MPI, generally because of the MPI-like approach chosen for OpenMP threads. However, the type of reduction is different under the two approaches.
+
 ![Force Task](img/OpenMP_Force_tk.png)
 ![RunTime Task](img/OpenMP_RunTime_tk.png)
 
+The time scalability with threads for Force and RunTime is also similar to the one from MPI: the size 108 is however showing slowdowns in RunTime with large number of threads, which are signs of weak scalability.  
+
 ![Force Speedup](img/OpenMP_Force_sp.png)
 ![RunTime Speedup](img/OpenMP_RunTime_sp.png)
+
+The speedup under OpenMP is approaching the ideal speedup only in case of large sizes (2916, 78732), while the simulation with 108 atoms is generally not improving over the serial timings.
 
 ### MPI+OpenMP
 Parallel runs using both MPI and OpenMP with: 
@@ -117,18 +126,18 @@ Number of proc. elements*threads < 32 (maximum number of cores in a Leonardo nod
 This hybrid approach is done in an "orthogonal" way, where the MPI and OpenMP cohexist by using buffers with increased sizes, indices depending on nPEs and number of threads, as well as on the processor rank and thread id, and making sure that the MPI calls are not done inside the OpenMP parallel region.
 We used heatmaps, one for each simulation size, to display the timings of all possible nPEs-nthreads combinations:  
 
-![Force Tasks/Threads](img/MPI_OpenMP_Force_108.png)
+![Force Tasks/Threads](img/MPI_OpenMP_Force_02_108.png)
 
 In the case of the smallest system size (108), there is no real scaling in the Force computations timings normalized by their calls, since the timings are practically constant.
 
-![Force Tasks/Threads](img/MPI_OpenMP_Force_2916.png)
-![Force Tasks/Threads](img/MPI_OpenMP_Force_78732.png)
+![Force Tasks/Threads](img/MPI_OpenMP_Force_02_2916.png)
+![Force Tasks/Threads](img/MPI_OpenMP_Force_02_78732.png)
 
-However, by increasing the system size (2916, 78732), we see that there is a reduction in timing, though there is not a clear "best" way to parallelize: all nPEs/nthreads combinations who fully exploit the cores in the node (i.e., nPEs*nthreads = 32) have generally similar timings, even at the biggest problem size (78732). A balanced combination within the node for size = 78732, according to the heatmap, would be nPEs = 8 and nthreads = 4, but by a small margin over the other competing combinations. This is probably due to the Leonardo system being a well balanced one, where its limits due to memory would be reached only with an even bigger simulation size.    
+However, by increasing the system size (2916, 78732), we see that there is a reduction in timing, though there is not a clear "best" way to parallelize: all nPEs/nthreads combinations who fully exploit the cores in the node (i.e., nPEs*nthreads = 32) have generally similar timings, even at the biggest problem size (78732). A balanced combination within the node for size = 78732, according to the heatmap, would be nPEs = 8 and nthreads = 4. This is probably due to the Leonardo system being a well balanced one, where its limits due to memory would be reached only with an even bigger simulation size.    
 
-![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_108.png)
-![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_2916.png)
-![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_78732.png)
+![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_02_108.png)
+![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_02_2916.png)
+![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_02_78732.png)
 
 Similar results can be seen while considering the whole RunTime timings for the combinations; however, in the case of the 108 size simultion, we observe that there is not actually a speedup with the most performant nPEs-nthreads combinations, but a slowdown, so we can consider those cases a form of weak scalarity.
 
