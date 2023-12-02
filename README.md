@@ -55,11 +55,13 @@ The *gprof* profiler of the Optimized version clearly shows that the majority of
 
 **granularity: each sample hit covers 2 byte(s) for 0.52% of 1.91 seconds**
 
-*index  % time    self    children    called     name*
+*index|% time|self|children|called|name*
 
-1         63.9    1.22        0.00              force 
-2         30.4    0.58        0.00                pbc 
-3          5.2    0.10        0.00             azzero 
+1|63.9|1.22|0.00| |force
+
+2|30.4|0.58|0.00| |pbc 
+
+3|5.2|0.10|0.00| |azzero 
 
 which explains why is it important to improve the speedup by parallelization of the Force function itself, as explained in the following paragraphs.
 
@@ -94,10 +96,13 @@ The OpenMP codelines, similarly to MPI, are enabled by *#ifdef (_OPENMP) [...] #
 - after the computation of forces by each thread, an *omp barrier* is raised to synchronize the results of forces computed from all threads and reduce them in a parallel way, dependent on the number of threads. This is still done on top of the Optimized version of the Force function.
 OpenMP *parallel for* is also applied to the loops inside the functions velverlet and velverlet_prop.  
 
-![RunTime Size](img/OpenMP_RunTime_sz.png)
-![RunTime Task](img/OpenMP_RunTime_tk.png)
 ![Force Size](img/OpenMP_Force_sz.png)
 ![Force Task](img/OpenMP_Force_tk.png)
+![RunTime Size](img/OpenMP_RunTime_sz.png)
+![RunTime Task](img/OpenMP_RunTime_tk.png)
+
+![Force Speedup](img/OpenMP_Force_sp.png)
+![RunTime Speedup](img/OpenMP_RunTime_sp.png)
 
 ### MPI+OpenMP
 Parallel runs using both MPI and OpenMP with: 
@@ -107,17 +112,17 @@ Parallel runs using both MPI and OpenMP with:
 Number of proc. elements*threads < 32 (maximum number of cores in a Leonardo node in Booster).
 This hybrid approach is done in an "orthogonal" way, where the MPI and OpenMP cohexist by using buffers with increased sizes, indices depending on nPEs and number of threads, as well as on the processor rank and thread id, and making sure that the MPI calls are not done inside the OpenMP parallel region.  
 
-![Force Tasks/Threads](img/MPI_OpenMPForce__108.png)
+![Force Tasks/Threads](img/MPI_OpenMP_Force_108.png)
 
 In the case of the smallest system size (108), there is no real scaling in the Force computations timings normalized by their calls, since the timings are practically constant.
 
-![Force Tasks/Threads](img/MPI_OpenMPForce__2916.png)
-![Force Tasks/Threads](img/MPI_OpenMPForce__78732.png)
+![Force Tasks/Threads](img/MPI_OpenMP_Force_2916.png)
+![Force Tasks/Threads](img/MPI_OpenMP_Force_78732.png)
 
 However, by increasing the system size (2916, 78732), we see that there is a reduction in timing, though there is not a clear "best" way to parallelize: all nPEs/nthreads combinations who fully exploit the cores in the node (i.e., nPEs*nthreads = 32) have generally similar timings, even at the biggest problem size (78732). A balanced combination within the node for size = 78732, according to the heatmap, would be nPEs = 8 and nthreads = 4, but by a small margin over the other competing combinations. This is probably due to the Leonardo system being a well balanced one, where its limits due to memory would be reached only with an even bigger simulation size.    
 
-![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__108.png)
-![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__2916.png)
-![RunTime Tasks/Threads](img/MPI_OpenMPRunTime__78732.png)
+![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_108.png)
+![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_2916.png)
+![RunTime Tasks/Threads](img/MPI_OpenMP_RunTime_78732.png)
 
 Similar results can be seen considering the whole RunTime timings for the combinations; however, some timing reductions can be observed here at the 108 size, though the number of  
