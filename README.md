@@ -1,9 +1,9 @@
 # LJMB
 A simple Lennard-Jones Many-Body (LJMB) Simulator Optimization and Parallelization
 
-- Andrea -> PpenMP
-- Fathi  -> MPI
-- Ken    -> Optimization
+- Andrea -> OpenMP
+- Ken    -> MPI
+- Fathi  -> Optimization
 
 ## Filesystem
 
