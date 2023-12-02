@@ -1,6 +1,6 @@
 set term png size 700,600
-set xlabel "Tasks"
-set ylabel "Threads"
+set xlabel "Threads"
+set ylabel "Tasks"
 set clabel "Time"
 set xrange [-0.5:4.5]
 set size square

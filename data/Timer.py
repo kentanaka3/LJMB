@@ -55,68 +55,80 @@ for arg in range(1, len(sys.argv)):
       z.add(files[3])
     if len(y) == 1:
       # OpenMP
+      x = sorted(list(x))
       z = sorted(list(z))
-      for i in z:
-        a = "_".join(["", str(list(x)[0]), str(list(y)[0]), i])
-        for sz in M[a].keys():
-          for t in M[a][sz]:
-            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'w') as fr:
-              fr.write("# " + t + "\n")
-      for i in z:
-        a = "_".join(["", str(list(x)[0]), str(list(y)[0]), i])
-        for sz in M[a].keys():
-          for t in M[a][sz]:
-            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
-              fr.write(f"{i}\t{M[a][sz][t][1]/M[a][sz][t][0]}\n")
-              print(i, M[a][sz][t][1]/M[a][sz][t][0])
+      for i in x:
+        for j in z:
+          a = "_".join(["", i, str(list(y)[0]), j])
+          for sz in M[a].keys():
+            for t in M[a][sz]:
+              with open(os.path.join(pathname, f"{t}_{i}_{sz}_tk.dat"), 'w') as fr:
+                fr.write(f"# {t}\n# Nd | Th | Time\n")
+        for j in z:
+          a = "_".join(["", i, str(list(y)[0]), j])
+          for sz in M[a].keys():
+            for t in M[a][sz]:
+              with open(os.path.join(pathname, f"{t}_{i}_{sz}_tk.dat"), 'a') as fr:
+                fr.write(f"{i}\t{j}\t{M[a][sz][t][1]/M[a][sz][t][0]}\n")
+                print(i, M[a][sz][t][1]/M[a][sz][t][0])
     elif len(z) == 1:
       # MPI
+      x = sorted(list(x))
       y = sorted(list(y))
-      for i in y:
-        a = "_".join(["", str(list(x)[0]), i, str(list(z)[0])])
-        for sz in M[a].keys():
-          for t in M[a][sz]:
-            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'w') as fr:
-              fr.write("# " + t + "\n")
-      for i in y:
-        a = "_".join(["", str(list(x)[0]), i, str(list(z)[0])])
-        for sz in M[a].keys():
-          for t in M[a][sz]:
-            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
-              fr.write(f"{i}\t{M[a][sz][t][1]/M[a][sz][t][0]}\n")
-              print(i, M[a][sz][t][1]/M[a][sz][t][0])
+      for i in x:
+        for j in y:
+          a = "_".join(["", i, j, str(list(z)[0])])
+          if a in M:
+            for sz in M[a].keys():
+              for t in M[a][sz]:
+                with open(os.path.join(pathname, f"{t}_{i}_{sz}_tk.dat"), 'w') as fr:
+                  fr.write(f"# {t}\n# Nd | Tk | Time (ms)\n")
+      for i in x:
+        for j in y:
+          a = "_".join(["", i, j, str(list(z)[0])])
+          if a in M:
+            for sz in M[a].keys():
+              for t in M[a][sz]:
+                with open(os.path.join(pathname, f"{t}_{i}_{sz}_tk.dat"), 'a') as fr:
+                  fr.write(f"{i}\t{j}\t{M[a][sz][t][1]/M[a][sz][t][0]}\n")
+                  print(i, j, M[a][sz][t][1]/M[a][sz][t][0])
     else:
       # MPI + OpenMP
+      x = sorted(list(x))
       y = sorted(list(y))
       z = sorted(list(z))
-      for i in y:
-        for j in z:
-          a = "_".join(["", str(list(x)[0]), i, j])
+      for i in x:
+        for j in y:
+          for k in z:
+            a = "_".join(["", i, j, k])
+            if a in M:
+              for sz in M[a].keys():
+                for t in M[a][sz]:
+                  with open(os.path.join(pathname, f"{t}_{i}_{sz}_tk.dat"), 'w') as fr:
+                    fr.write("")
+      for i in x:
+        for j in y:
+          for k in z:
+            a = "_".join(["", i, j, k])
+            if a in M:
+              for sz in M[a].keys():
+                for t in M[a][sz]:
+                  with open(os.path.join(pathname, f"{t}_{i}_{sz}_tk.dat"), 'a') as fr:
+                    fr.write(f"{M[a][sz][t][1]/M[a][sz][t][0]}\t")
+                    print(i, j, M[a][sz][t][1]/M[a][sz][t][0])
+            else:
+              a = "_".join(["", i, j, z[0]])
+              if a in M:
+                for sz in M[a].keys():
+                  for t in M[a][sz]:
+                    with open(os.path.join(pathname, f"{t}_{i}_{sz}_tk.dat"), 'a') as fr:
+                      fr.write(f"NaN\t")
+          a = "_".join(["", i, j, z[0]])
           if a in M:
             for sz in M[a].keys():
               for t in M[a][sz]:
-                with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'w') as fr:
-                  fr.write("")
-      for i in y:
-        for j in z:
-          a = "_".join(["", str(list(x)[0]), i, j])
-          if a in M:
-            for sz in M[a].keys():
-              for t in M[a][sz]:
-                with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
-                  fr.write(f"{M[a][sz][t][1]/M[a][sz][t][0]}\t")
-                  print(i, j, M[a][sz][t][1]/M[a][sz][t][0])
-          else:
-            a = "_".join(["", str(list(x)[0]), i, z[0]])
-            for sz in M[a].keys():
-              for t in M[a][sz]:
-                with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
-                  fr.write(f"NaN\t")
-        a = "_".join(["", str(list(x)[0]), i, z[0]])
-        for sz in M[a].keys():
-          for t in M[a][sz]:
-            with open(os.path.join(pathname, f"{t}_{sz}_tk.dat"), 'a') as fr:
-              fr.write(f"\n")
+                with open(os.path.join(pathname, f"{t}_{i}_{sz}_tk.dat"), 'a') as fr:
+                  fr.write(f"\n")
 
   for a in M.keys():
     x = list(M[a].keys())
