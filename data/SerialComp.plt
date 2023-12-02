@@ -8,4 +8,5 @@ set output "../img/SerialComp_".ARG1."_sz.png"
 set format x "10^{%T}"
 set xrange [100:100000]
 set xlabel "System Size"
+set key top left
 plot for [i=1:words(ARG2)] "Timer/".word(ARG2, i)."/".ARG1."_01_01_01_sz.dat" w lp title word(ARG2, i)
