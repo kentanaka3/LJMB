@@ -1,12 +1,10 @@
-set term png size 300,300
+set term png size 400,400
 set ylabel "Speedup"
 set xlabel "# Tasks"
 set print
 set size square
 set key top left
 array Serial[words(ARG2)]
-set xrange [1:35]
-set yrange [1:35]
 do for [i=1:words(ARG1)] {
   # Serial
   print word(ARG1, i)
@@ -18,12 +16,12 @@ do for [i=1:words(ARG1)] {
   # MPI
   set title word(ARG1, i)
   set output "../img/MPI_".word(ARG1, i)."_sp.png"
-  plot for [j=1:words(ARG2)] "Timer/MPI/".word(ARG1, i).word(ARG2, j)."_tk.dat" \
-       u 2:(Serial[j]/($2*$1*$3)) w lp title substr(word(ARG2, j), 2, strlen(word(ARG2, j))), \
+  plot for [j=1:words(ARG2)] for [k=1:words(ARG3)] "Timer/MPI/".word(ARG1, i)."_".word(ARG3, k).word(ARG2, j)."_tk.dat" \
+       u 2:(Serial[j]/($3*$1)) w lp title "Sz: ".substr(word(ARG2, j), 2, strlen(word(ARG2, j))), \
        x
   # OpenMP
   set output "../img/OpenMP_".word(ARG1, i)."_sp.png"
-  plot for [j=1:words(ARG2)] "Timer/OpenMP/".word(ARG1, i).word(ARG2, j)."_tk.dat" \
-       u 1:(Serial[j]/$2) w lp title substr(word(ARG2, j), 2, strlen(word(ARG2, j))), \
+  plot for [j=1:words(ARG2)] "Timer/OpenMP/".word(ARG1, i)."_01".word(ARG2, j)."_tk.dat" \
+       u 2:(Serial[j]/($3)) w lp title substr(word(ARG2, j), 2, strlen(word(ARG2, j))), \
        x
 }

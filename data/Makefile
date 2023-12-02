@@ -14,18 +14,18 @@ organize:
 plot:
 	gnuplot -c SerialComp.plt Force "Serial Optimization"
 	gnuplot -c SerialComp.plt RunTime "Serial Optimization"
-	gnuplot -c Timer.plt Force "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01 _02_02_01 _02_04_01 _02_08_01 _02_16_01 _02_32_01 _04_02_01 _04_04_01 _04_08_01 _04_16_01 _04_32_01 _08_02_01 _08_04_01 _08_08_01 _08_16_01 _08_32_01" "01 02 04 08" Size
-	gnuplot -c Timer.plt RunTime "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01 _02_02_01 _02_04_01 _02_08_01 _02_16_01 _02_32_01 _04_02_01 _04_04_01 _04_08_01 _04_16_01 _04_32_01 _08_02_01 _08_04_01 _08_08_01 _08_16_01 _08_32_01" "01 02 04 08" Size
+	gnuplot -c Timer.plt Force "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01" "01 02 04 08" Size
+	gnuplot -c Timer.plt RunTime "MPI" "_01_02_01 _01_04_01 _01_08_01 _01_16_01 _01_32_01" "01 02 04 08" Size
 	gnuplot -c Timer.plt Force "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" "01" Size
 	gnuplot -c Timer.plt RunTime "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" "01" Size
 	gnuplot -c Timer.plt Velverlet "OpenMP" "_01_01_02 _01_01_04 _01_01_08 _01_01_16 _01_01_32" "01" Size
-	gnuplot -c Timer.plt Force "MPI" "_108 _2916 _78732" "01 02 04 08" Task
-	gnuplot -c Timer.plt RunTime "MPI" "_108 _2916 _78732" "01 02 04 08" Task
+	gnuplot -c Timer.plt Force "MPI" "_108 _2916 _78732" "01" Task
+	gnuplot -c Timer.plt RunTime "MPI" "_108 _2916 _78732" "01" Task
 	gnuplot -c Timer.plt Force "OpenMP" "_108 _2916 _78732" "01" Task
 	gnuplot -c Timer.plt RunTime "OpenMP" "_108 _2916 _78732" "01" Task
 	gnuplot -c Timer.plt Velverlet "OpenMP" "_108 _2916 _78732" "01" Task
-	gnuplot -c Mtx.plt "Force RunTime Velverlet" "_108 _2916 _78732"
-	gnuplot -c SpeedUp.plt "Force RunTime Velverlet" "_108 _2916 _78732" "01 02 04 08"
+	gnuplot -c Mtx.plt "Force RunTime Velverlet" "_108 _2916 _78732" "01 02 04 08"
+	gnuplot -c SpeedUp.plt "Force RunTime Velverlet" "_108 _2916 _78732" "01"
 clean:
 	rm -f *.dat
 	rm -f *.xyz
